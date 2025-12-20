@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>さんすうれんしゅう（Kawaiiフルセット版）</title>
+    <title>さんすうれんしゅう</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -385,7 +385,7 @@
             });
         } else if (op === 'sub') {
             const targets = mode === 'dan' ? [dan] : range;
-            targets.forEach(n2 => { // n2を固定して「n2を引く練習」にする
+            targets.forEach(n2 => {
                 range.forEach(ans => {
                     const n1 = ans + n2;
                     p.push({ n1, n2, op: '－', ans });
@@ -393,7 +393,7 @@
             });
         } else if (op === 'div') {
             const targets = mode === 'dan' ? [dan] : range;
-            targets.forEach(n2 => { // n2を固定して「n2で割る練習」にする
+            targets.forEach(n2 => {
                 range.forEach(ans => {
                     const n1 = ans * n2;
                     p.push({ n1, n2, op: '÷', ans });
@@ -401,7 +401,18 @@
             });
         }
         
-        if (order === 'random') p = shuffleArray(p);
+        // 「全部をシャッフル」の場合の処理
+        if (mode === 'all') {
+            // 全組み合わせからランダムに10個抽出
+            p = shuffleArray(p).slice(0, 10);
+            // 順序が「じゅんばん」なら並び替える
+            if (order === 'sequential') {
+                p.sort((a, b) => (a.n1 - b.n1) || (a.n2 - b.n2));
+            }
+        } else {
+            // モードが「特定の数（だん）」の場合
+            if (order === 'random') p = shuffleArray(p);
+        }
         
         quizState.problems = p;
         quizState.currentIndex = 0;
@@ -462,7 +473,7 @@
         } else if (val === 'Enter') {
             if (quizState.currentInput !== "") checkAnswer();
         } else {
-            if (quizState.currentInput.length < 3) { // 3桁まで（割り算の被除数などが大きくなる可能性考慮）
+            if (quizState.currentInput.length < 3) {
                 quizState.currentInput += val;
                 elements.answerDisplay.textContent = quizState.currentInput;
             }
