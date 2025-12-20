@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>九九れんしゅう（Kawaiiバランス調整版）</title>
+    <title>さんすうれんしゅう（Kawaiiフルセット版）</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -101,6 +101,18 @@
 
         .scroll-hide::-webkit-scrollbar { display: none; }
         .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* 演算選択タイル */
+        .op-tile {
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 3px solid transparent;
+        }
+        .op-tile input:checked + div {
+            border-color: #ff99cc;
+            background-color: #fff5f7;
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
@@ -118,13 +130,51 @@
             <div id="settings-screen" class="h-full flex flex-col p-5">
                 <div class="text-center mb-4 flex-shrink-0">
                     <span class="text-4xl">🎀</span>
-                    <h1 class="text-2xl font-extrabold text-gray-700 mt-1">九九れんしゅう</h1>
+                    <h1 class="text-2xl font-extrabold text-gray-700 mt-1">さんすうれんしゅう</h1>
                 </div>
 
-                <div class="flex-grow overflow-y-auto scroll-hide space-y-6 pb-4">
+                <div class="flex-grow overflow-y-auto scroll-hide space-y-5 pb-4">
+                    <!-- 1. 演算選択 -->
                     <div class="space-y-3">
                         <h2 class="text-lg font-bold text-gray-600 flex items-center">
-                            <span class="mr-2">🍭</span> モードを えらんでね
+                            <span class="mr-2">🍭</span> なにを お勉強する？
+                        </h2>
+                        <div class="grid grid-cols-4 gap-2">
+                            <label class="op-tile">
+                                <input type="radio" name="operation" value="add" class="hidden">
+                                <div class="bg-[#f0f4ff] p-3 rounded-2xl text-center">
+                                    <div class="text-2xl mb-1">➕</div>
+                                    <div class="text-[10px] font-bold text-gray-500">たしざん</div>
+                                </div>
+                            </label>
+                            <label class="op-tile">
+                                <input type="radio" name="operation" value="sub" class="hidden">
+                                <div class="bg-[#fff5f7] p-3 rounded-2xl text-center">
+                                    <div class="text-2xl mb-1">➖</div>
+                                    <div class="text-[10px] font-bold text-gray-500">ひきざん</div>
+                                </div>
+                            </label>
+                            <label class="op-tile">
+                                <input type="radio" name="operation" value="mul" class="hidden" checked>
+                                <div class="bg-[#f5fff0] p-3 rounded-2xl text-center">
+                                    <div class="text-2xl mb-1">✖️</div>
+                                    <div class="text-[10px] font-bold text-gray-500">かけざん</div>
+                                </div>
+                            </label>
+                            <label class="op-tile">
+                                <input type="radio" name="operation" value="div" class="hidden">
+                                <div class="bg-[#fdfcf0] p-3 rounded-2xl text-center">
+                                    <div class="text-2xl mb-1">➗</div>
+                                    <div class="text-[10px] font-bold text-gray-500">わりざん</div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 2. モード選択 -->
+                    <div class="space-y-3">
+                        <h2 class="text-lg font-bold text-gray-600 flex items-center">
+                            <span class="mr-2">🧩</span> もんだいの 出しかた
                         </h2>
                         <div class="grid grid-cols-1 gap-2">
                             <label class="flex items-center p-3 border-2 border-[#ccebff] bg-[#eef9ff] rounded-2xl cursor-pointer shadow-sm">
@@ -135,7 +185,7 @@
                             <label class="block p-3 border-2 border-[#d4fcd9] bg-[#f2fff5] rounded-2xl cursor-pointer shadow-sm">
                                 <div class="flex items-center">
                                     <input type="radio" name="mode" value="dan" class="w-5 h-5 accent-[#98fb98]">
-                                    <span class="ml-3 text-base text-gray-700 font-bold">「だん」を えらぶ</span>
+                                    <span class="ml-3 text-base text-gray-700 font-bold" id="dan-mode-label">「だん」を えらぶ</span>
                                 </div>
                                 <div id="dan-selector" class="mt-2 hidden">
                                     <select id="dan-select" class="w-full p-2 border-2 border-[#d4fcd9] rounded-xl text-base font-bold bg-white outline-none text-gray-700">
@@ -146,6 +196,7 @@
                         </div>
                     </div>
 
+                    <!-- 3. 順序選択 -->
                     <div class="space-y-3">
                         <h2 class="text-lg font-bold text-gray-600 flex items-center">
                             <span class="mr-2">🎨</span> じゅんばん
@@ -253,6 +304,7 @@
         resultsScreen: document.getElementById('results-screen'),
         danSelect: document.getElementById('dan-select'),
         danSelector: document.getElementById('dan-selector'),
+        danModeLabel: document.getElementById('dan-mode-label'),
         startButton: document.getElementById('start-button'),
         problemText: document.getElementById('problem-text'),
         answerDisplay: document.getElementById('answer-display'),
@@ -265,7 +317,8 @@
         resetQuizButton: document.getElementById('reset-quiz-button'),
         keypad: document.getElementById('keypad'),
         modeOptions: document.getElementsByName('mode'),
-        orderOptions: document.getElementsByName('order')
+        orderOptions: document.getElementsByName('order'),
+        operationOptions: document.getElementsByName('operation')
     };
 
     let quizState = {
@@ -274,15 +327,8 @@
         correctCount: 0,
         isAwaitingNext: false,
         currentInput: "",
-        settings: { mode: 'all', dan: 1, order: 'sequential' }
+        settings: { op: 'mul', mode: 'all', dan: 1, order: 'sequential' }
     };
-
-    const allMultiplication = [];
-    for (let i = 1; i <= 9; i++) {
-        for (let j = 1; j <= 9; j++) {
-            allMultiplication.push({ num1: i, num2: j, answer: i * j });
-        }
-    }
 
     function shuffleArray(array) {
         let newArray = [...array];
@@ -302,22 +348,59 @@
         if (screenName === 'results') elements.resultsScreen.classList.remove('hidden');
     }
 
+    function updateDanLabel() {
+        const op = Array.from(elements.operationOptions).find(r => r.checked).value;
+        const labels = {
+            'add': '「たす数」を えらぶ',
+            'sub': '「ひく数」を えらぶ',
+            'mul': '「だん」を えらぶ',
+            'div': '「わる数」を えらぶ'
+        };
+        elements.danModeLabel.textContent = labels[op] || '「かず」を えらぶ';
+    }
+
     function toggleDanSelector() {
         const isDanMode = Array.from(elements.modeOptions).find(r => r.checked).value === 'dan';
         elements.danSelector.classList.toggle('hidden', !isDanMode);
     }
 
     function generateProblems() {
+        const op = Array.from(elements.operationOptions).find(r => r.checked).value;
         const mode = Array.from(elements.modeOptions).find(r => r.checked).value;
         const order = Array.from(elements.orderOptions).find(r => r.checked).value;
         const dan = parseInt(elements.danSelect.value, 10);
         
         let p = [];
-        if (mode === 'dan') {
-            for (let j = 1; j <= 9; j++) p.push({ num1: dan, num2: j, answer: dan * j });
-        } else {
-            p = [...allMultiplication];
+        const range = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+        if (op === 'mul') {
+            const targets = mode === 'dan' ? [dan] : range;
+            targets.forEach(n1 => {
+                range.forEach(n2 => p.push({ n1, n2, op: '×', ans: n1 * n2 }));
+            });
+        } else if (op === 'add') {
+            const targets = mode === 'dan' ? [dan] : range;
+            targets.forEach(n1 => {
+                range.forEach(n2 => p.push({ n1, n2, op: '＋', ans: n1 + n2 }));
+            });
+        } else if (op === 'sub') {
+            const targets = mode === 'dan' ? [dan] : range;
+            targets.forEach(n2 => { // n2を固定して「n2を引く練習」にする
+                range.forEach(ans => {
+                    const n1 = ans + n2;
+                    p.push({ n1, n2, op: '－', ans });
+                });
+            });
+        } else if (op === 'div') {
+            const targets = mode === 'dan' ? [dan] : range;
+            targets.forEach(n2 => { // n2を固定して「n2で割る練習」にする
+                range.forEach(ans => {
+                    const n1 = ans * n2;
+                    p.push({ n1, n2, op: '÷', ans });
+                });
+            });
         }
+        
         if (order === 'random') p = shuffleArray(p);
         
         quizState.problems = p;
@@ -335,7 +418,7 @@
         elements.keypad.classList.remove('hidden');
         elements.nextButtonContainer.classList.add('hidden');
         
-        elements.problemText.textContent = `${problem.num1} × ${problem.num2}`;
+        elements.problemText.textContent = `${problem.n1} ${problem.op} ${problem.n2}`;
         elements.progressText.textContent = `${quizState.currentIndex + 1} / ${quizState.problems.length}`;
     }
 
@@ -348,12 +431,12 @@
         elements.keypad.classList.add('hidden');
         elements.nextButtonContainer.classList.remove('hidden');
 
-        if (userAnswer === problem.answer) {
+        if (userAnswer === problem.ans) {
             quizState.correctCount++;
             elements.answerDisplay.textContent = "○ せいかい！";
             elements.answerDisplay.style.color = "#7ad18a";
         } else {
-            elements.answerDisplay.textContent = `× こたえ:${problem.answer}`;
+            elements.answerDisplay.textContent = `× こたえ:${problem.ans}`;
             elements.answerDisplay.style.color = "#ff85b3";
         }
         quizState.isAwaitingNext = true;
@@ -379,7 +462,7 @@
         } else if (val === 'Enter') {
             if (quizState.currentInput !== "") checkAnswer();
         } else {
-            if (quizState.currentInput.length < 2) {
+            if (quizState.currentInput.length < 3) { // 3桁まで（割り算の被除数などが大きくなる可能性考慮）
                 quizState.currentInput += val;
                 elements.answerDisplay.textContent = quizState.currentInput;
             }
@@ -389,7 +472,7 @@
     function initialize() {
         for (let i = 1; i <= 9; i++) {
             const opt = document.createElement('option');
-            opt.value = i; opt.textContent = `${i}のだん`;
+            opt.value = i; opt.textContent = `${i} のかず`;
             elements.danSelect.appendChild(opt);
         }
 
@@ -400,6 +483,8 @@
         });
 
         Array.from(elements.modeOptions).forEach(r => r.addEventListener('change', toggleDanSelector));
+        Array.from(elements.operationOptions).forEach(r => r.addEventListener('change', updateDanLabel));
+
         elements.nextButton.addEventListener('click', nextProblem);
         elements.reviewButton.addEventListener('click', () => showScreen('settings'));
         elements.resetQuizButton.addEventListener('click', () => showScreen('settings'));
@@ -412,6 +497,7 @@
 
         showScreen('settings');
         toggleDanSelector();
+        updateDanLabel();
     }
 
     window.onload = initialize;
