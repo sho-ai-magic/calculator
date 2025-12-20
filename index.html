@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>九九フラッシュカード練習帳（Kawaiiスタイル）</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Kawaiiな丸文字系 -->
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+        }
+        
+        body {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            margin: 0;
+            overflow: hidden;
+        }
+        body::-webkit-scrollbar {
+            display: none;
+        }
+
+        .main-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* ゆめかわいいグラデーション背景 */
+            background: linear-gradient(135deg, #fff5f7 0%, #f0f4ff 50%, #f5fff0 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 背景の装飾用アイコン */
+        .deco-icon {
+            position: absolute;
+            z-index: 0;
+            opacity: 0.4;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .card {
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 15px 35px rgba(255, 182, 193, 0.2);
+            transition: all 0.3s ease;
+            background-color: rgba(255, 255, 255, 0.95);
+            border: 4px solid #ffffff;
+            border-radius: 2rem;
+            min-height: 640px;
+        }
+
+        /* パステルカラー定義（Kawaii版） */
+        .kawaii-pink-bg { background-color: #ffeff2; }
+        .kawaii-pink-border { border-color: #ffcce0; }
+        .kawaii-pink-text { color: #ff85b3; }
+        .kawaii-pink-btn { 
+            background-color: #ff99cc; 
+            border-bottom: 4px solid #ff66a3;
+        }
+        .kawaii-pink-btn:active {
+            border-bottom: 0px solid #ff66a3;
+            transform: translateY(4px);
+        }
+
+        .kawaii-blue-bg { background-color: #eef9ff; }
+        .kawaii-blue-border { border-color: #ccebff; }
+        .kawaii-blue-text { color: #70c1ff; }
+        .kawaii-blue-btn { 
+            background-color: #87ceeb;
+            border-bottom: 4px solid #5fbadd;
+        }
+        .kawaii-blue-btn:active {
+            border-bottom: 0px solid #5fbadd;
+            transform: translateY(4px);
+        }
+
+        .kawaii-green-bg { background-color: #f2fff5; }
+        .kawaii-green-border { border-color: #d4fcd9; }
+        .kawaii-green-text { color: #7ad18a; }
+        .kawaii-green-btn { 
+            background-color: #98fb98;
+            border-bottom: 4px solid #6edb6e;
+        }
+        .kawaii-green-btn:active {
+            border-bottom: 0px solid #6edb6e;
+            transform: translateY(4px);
+        }
+
+        .kawaii-purple-btn { 
+            background-color: #ccb3ff;
+            border-bottom: 4px solid #a680ff;
+        }
+        .kawaii-purple-btn:active {
+            border-bottom: 0px solid #a680ff;
+            transform: translateY(4px);
+        }
+
+        /* テンキーボタンのデザイン */
+        .keypad-btn {
+            font-size: 1.75rem;
+            font-weight: 800;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 1.25rem;
+            transition: all 0.1s;
+            user-select: none;
+            touch-action: manipulation;
+            border-bottom: 4px solid rgba(0,0,0,0.1);
+        }
+        .keypad-btn:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+
+        .interaction-area {
+            min-height: 290px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* ふわふわ揺れるアニメーション */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="main-container">
+
+    <!-- 背景の装飾デコ -->
+    <div class="deco-icon text-4xl top-10 left-10 floating" style="animation-delay: 0s;">✨</div>
+    <div class="deco-icon text-5xl top-20 right-10 floating" style="animation-delay: 1s;">💖</div>
+    <div class="deco-icon text-4xl bottom-20 left-10 floating" style="animation-delay: 0.5s;">🎀</div>
+    <div class="deco-icon text-5xl bottom-10 right-20 floating" style="animation-delay: 1.5s;">🌟</div>
+
+    <div id="app" class="w-full max-w-md p-4 sm:p-6">
+        
+        <!-- 設定画面 -->
+        <div id="settings-screen" class="card p-6 flex flex-col space-y-6">
+            <div class="text-center">
+                <span class="text-pink-400 text-4xl">🎀</span>
+                <h1 class="text-3xl font-extrabold text-gray-700 mt-2">九九れんしゅう</h1>
+            </div>
+
+            <!-- モード選択 -->
+            <div class="space-y-4">
+                <h2 class="text-lg font-bold text-gray-600 flex items-center">
+                    <span class="mr-2">🍭</span> どっちで あそぶ？
+                </h2>
+                <div class="space-y-3">
+                    <label class="flex items-center p-4 border-2 rounded-2xl cursor-pointer kawaii-blue-border kawaii-blue-bg hover:opacity-90 transition shadow-sm">
+                        <input type="radio" name="mode" value="all" id="mode-all" class="w-5 h-5 accent-blue-400" checked>
+                        <span class="ml-3 text-gray-700 font-bold">ぜんぶを シャッフル！</span>
+                    </label>
+                    
+                    <label class="block p-4 border-2 rounded-2xl cursor-pointer kawaii-green-border kawaii-green-bg hover:opacity-90 transition shadow-sm">
+                        <div class="flex items-center">
+                            <input type="radio" name="mode" value="dan" id="mode-dan" class="w-5 h-5 accent-green-400">
+                            <span class="ml-3 text-gray-700 font-bold">すきな「だん」を えらぶ</span>
+                        </div>
+                        <div id="dan-selector" class="mt-3 ml-8 hidden">
+                            <select id="dan-select" class="w-full p-3 border-2 kawaii-green-border rounded-xl text-gray-700 font-bold bg-white focus:outline-none">
+                                <!-- JSで生成 -->
+                            </select>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- 順序選択 -->
+            <div class="space-y-4 pt-4 border-t border-pink-100">
+                <h2 class="text-lg font-bold text-gray-600 flex items-center">
+                    <span class="mr-2">🎨</span> じゅんばん
+                </h2>
+                <div class="flex space-x-3">
+                    <label class="flex items-center justify-center flex-1 p-3 border-2 rounded-2xl cursor-pointer border-gray-200 bg-gray-50 hover:bg-white transition">
+                        <input type="radio" name="order" value="sequential" class="accent-pink-400" checked>
+                        <span class="ml-2 text-gray-700 font-bold">じゅんばん</span>
+                    </label>
+                    <label class="flex items-center justify-center flex-1 p-3 border-2 rounded-2xl cursor-pointer border-gray-200 bg-gray-50 hover:bg-white transition">
+                        <input type="radio" name="order" value="random" class="accent-pink-400">
+                        <span class="ml-2 text-gray-700 font-bold">ランダム</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex-grow"></div>
+            <button id="start-button" class="w-full py-5 kawaii-pink-btn text-white font-extrabold text-2xl rounded-3xl shadow-lg transition">
+                スタート！ ✨
+            </button>
+        </div>
+
+        <!-- クイズ画面 -->
+        <div id="quiz-screen" class="card p-6 hidden flex flex-col space-y-4">
+            <div class="flex justify-between items-center px-2">
+                <span class="text-pink-300">💖</span>
+                <h1 class="text-xl font-bold text-gray-600">九九フラッシュ</h1>
+                <span class="text-pink-300">💖</span>
+            </div>
+            
+            <p id="progress-text" class="text-center text-sm kawaii-blue-text font-bold h-5"></p>
+
+            <!-- 問題表示 -->
+            <div class="flex flex-col items-center justify-center p-6 kawaii-blue-bg rounded-3xl border-4 kawaii-blue-border h-36 shadow-inner relative">
+                <div class="absolute -top-3 -left-3 text-2xl">✨</div>
+                <div class="absolute -bottom-3 -right-3 text-2xl">✨</div>
+                <p id="problem-text" class="text-5xl font-black text-gray-800 tracking-tighter">5 × 8 = ?</p>
+            </div>
+
+            <!-- 入力欄 -->
+            <input type="text" id="answer-input" placeholder="？" readonly
+                   class="w-full text-center text-5xl p-2 border-4 border-pink-200 rounded-2xl bg-white text-pink-400 font-black focus:outline-none">
+
+            <!-- 操作エリア -->
+            <div class="interaction-area">
+                <div id="keypad" class="grid grid-cols-3 gap-3 py-2">
+                    <button class="keypad-btn kawaii-blue-bg text-blue-500" data-val="1">1</button>
+                    <button class="keypad-btn kawaii-blue-bg text-blue-500" data-val="2">2</button>
+                    <button class="keypad-btn kawaii-blue-bg text-blue-500" data-val="3">3</button>
+                    <button class="keypad-btn kawaii-blue-bg text-blue-500" data-val="4">4</button>
+                    <button class="keypad-btn kawaii-blue-bg text-blue-500" data-val="5">5</button>
+                    <button class="keypad-btn kawaii-blue-bg text-blue-500" data-val="6">6</button>
+                    <button class="keypad-btn kawaii-blue-bg text-blue-500" data-val="7">7</button>
+                    <button class="keypad-btn kawaii-blue-bg text-blue-500" data-val="8">8</button>
+                    <button class="keypad-btn kawaii-blue-bg text-blue-500" data-val="9">9</button>
+                    <button class="keypad-btn kawaii-pink-bg text-pink-500" data-val="C">消す</button>
+                    <button class="keypad-btn kawaii-blue-bg text-blue-500" data-val="0">0</button>
+                    <button id="check-button" class="keypad-btn kawaii-green-btn text-white" data-val="Enter">OK</button>
+                </div>
+
+                <div id="next-button-container" class="hidden h-full flex items-center">
+                    <button id="next-button" class="w-full py-12 kawaii-pink-btn text-white font-black text-4xl rounded-3xl shadow-lg">
+                        つぎへ ➔
+                    </button>
+                </div>
+            </div>
+
+            <!-- フィードバック -->
+            <div id="feedback-message" class="text-center text-2xl font-black h-10"></div>
+            
+            <div class="flex-grow"></div>
+            <button id="reset-quiz-button" class="w-full text-center text-sm text-gray-400 hover:text-pink-400 font-bold pb-2 transition">
+                やめる 🧸
+            </button>
+        </div>
+
+        <!-- 結果画面 -->
+        <div id="results-screen" class="card p-6 hidden flex flex-col justify-center items-center space-y-8">
+            <div class="text-center">
+                <p class="text-6xl mb-4">👑</p>
+                <h1 class="text-4xl font-black kawaii-pink-text">おめでとう！</h1>
+            </div>
+            
+            <div class="text-center bg-white border-4 border-dashed kawaii-green-border p-8 rounded-full shadow-lg">
+                <p class="text-lg text-gray-500 font-bold">ぜんぶで...</p>
+                <p id="final-score" class="text-7xl font-black kawaii-green-text mt-2">0 / 0</p>
+            </div>
+            
+            <button id="review-button" class="w-full py-5 kawaii-purple-btn text-white font-extrabold text-2xl rounded-3xl shadow-xl mt-auto">
+                もういっかい！ 🎀
+            </button>
+        </div>
+
+    </div>
+
+<script>
+    const elements = {
+        settingsScreen: document.getElementById('settings-screen'),
+        quizScreen: document.getElementById('quiz-screen'),
+        resultsScreen: document.getElementById('results-screen'),
+        danSelect: document.getElementById('dan-select'),
+        danSelector: document.getElementById('dan-selector'),
+        modeAll: document.getElementById('mode-all'),
+        modeDan: document.getElementById('mode-dan'),
+        startButton: document.getElementById('start-button'),
+        problemText: document.getElementById('problem-text'),
+        answerInput: document.getElementById('answer-input'),
+        checkButton: document.getElementById('check-button'),
+        nextButton: document.getElementById('next-button'),
+        nextButtonContainer: document.getElementById('next-button-container'),
+        feedbackMessage: document.getElementById('feedback-message'),
+        progressText: document.getElementById('progress-text'),
+        finalScore: document.getElementById('final-score'),
+        reviewButton: document.getElementById('review-button'),
+        resetQuizButton: document.getElementById('reset-quiz-button'),
+        keypad: document.getElementById('keypad')
+    };
+
+    let quizState = {
+        problems: [],
+        currentIndex: 0,
+        correctCount: 0,
+        isAwaitingNext: false,
+        settings: { mode: 'all', dan: 1, order: 'sequential' }
+    };
+
+    const allMultiplication = [];
+    for (let i = 1; i <= 9; i++) {
+        for (let j = 1; j <= 9; j++) {
+            allMultiplication.push({ num1: i, num2: j, answer: i * j });
+        }
+    }
+
+    function shuffleArray(array) {
+        let newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
+    }
+
+    function showScreen(screenName) {
+        elements.settingsScreen.classList.add('hidden');
+        elements.quizScreen.classList.add('hidden');
+        elements.resultsScreen.classList.add('hidden');
+        if (screenName === 'settings') elements.settingsScreen.classList.remove('hidden');
+        if (screenName === 'quiz') elements.quizScreen.classList.remove('hidden');
+        if (screenName === 'results') {
+            elements.resultsScreen.classList.remove('hidden');
+            // 花吹雪的な演出はここに追加可能
+        }
+    }
+
+    function toggleDanSelector() {
+        elements.danSelector.classList.toggle('hidden', !elements.modeDan.checked);
+    }
+
+    function generateProblems() {
+        const { mode, dan, order } = quizState.settings;
+        let p = [];
+        if (mode === 'dan') {
+            for (let j = 1; j <= 9; j++) p.push({ num1: dan, num2: j, answer: dan * j });
+        } else {
+            p = [...allMultiplication];
+        }
+        if (order === 'random') p = shuffleArray(p);
+        quizState.problems = p;
+        quizState.currentIndex = 0;
+        quizState.correctCount = 0;
+    }
+
+    function displayCurrentProblem() {
+        const problem = quizState.problems[quizState.currentIndex];
+        if (!problem) return;
+
+        elements.answerInput.value = '';
+        elements.feedbackMessage.textContent = '';
+        elements.keypad.classList.remove('hidden');
+        elements.nextButtonContainer.classList.add('hidden');
+        elements.quizScreen.classList.remove('correct-bg', 'incorrect-bg');
+        
+        elements.problemText.textContent = `${problem.num1} × ${problem.num2} = ?`;
+        elements.progressText.textContent = `${quizState.currentIndex + 1} / ${quizState.problems.length}`;
+    }
+
+    function checkAnswer() {
+        if (quizState.isAwaitingNext) return;
+        const problem = quizState.problems[quizState.currentIndex];
+        const userAnswer = parseInt(elements.answerInput.value, 10);
+
+        if (isNaN(userAnswer)) return;
+
+        elements.keypad.classList.add('hidden');
+        elements.nextButtonContainer.classList.remove('hidden');
+
+        if (userAnswer === problem.answer) {
+            quizState.correctCount++;
+            elements.feedbackMessage.textContent = '✨ せいかい！💮';
+            elements.feedbackMessage.className = 'text-center text-3xl font-black h-10 text-green-500';
+            elements.quizScreen.classList.add('correct-bg');
+        } else {
+            elements.feedbackMessage.textContent = `ざんねん💦 こたえは ${problem.answer}`;
+            elements.feedbackMessage.className = 'text-center text-2xl font-black h-10 text-pink-500';
+            elements.quizScreen.classList.add('incorrect-bg');
+        }
+        quizState.isAwaitingNext = true;
+    }
+
+    function nextProblem() {
+        quizState.isAwaitingNext = false;
+        quizState.currentIndex++;
+        if (quizState.currentIndex < quizState.problems.length) {
+            displayCurrentProblem();
+        } else {
+            elements.finalScore.textContent = `${quizState.correctCount} / ${quizState.problems.length}`;
+            showScreen('results');
+        }
+    }
+
+    function handleKeypadPress(val) {
+        if (quizState.isAwaitingNext) return;
+        
+        if (val === 'C') {
+            elements.answerInput.value = '';
+        } else if (val === 'Enter') {
+            if (elements.answerInput.value !== '') checkAnswer();
+        } else {
+            if (elements.answerInput.value.length < 2) {
+                elements.answerInput.value += val;
+            }
+        }
+    }
+
+    function initialize() {
+        for (let i = 1; i <= 9; i++) {
+            const opt = document.createElement('option');
+            opt.value = i; opt.textContent = `${i}のだん`;
+            elements.danSelect.appendChild(opt);
+        }
+
+        elements.startButton.addEventListener('click', () => {
+            quizState.settings.mode = document.querySelector('input[name="mode"]:checked').value;
+            quizState.settings.order = document.querySelector('input[name="order"]:checked').value;
+            quizState.settings.dan = parseInt(elements.danSelect.value, 10);
+            generateProblems();
+            showScreen('quiz');
+            displayCurrentProblem();
+        });
+
+        elements.modeAll.addEventListener('change', toggleDanSelector);
+        elements.modeDan.addEventListener('change', toggleDanSelector);
+        elements.nextButton.addEventListener('click', nextProblem);
+        elements.reviewButton.addEventListener('click', () => showScreen('settings'));
+        elements.resetQuizButton.addEventListener('click', () => showScreen('settings'));
+
+        elements.keypad.addEventListener('click', (e) => {
+            const btn = e.target.closest('button');
+            if (!btn) return;
+            handleKeypadPress(btn.dataset.val);
+        });
+
+        showScreen('settings');
+        toggleDanSelector();
+    }
+
+    window.onload = initialize;
+</script>
+
+</body>
+</html>
