@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>さんすうれんしゅう</title>
+    <title>さんすうれんしゅう（ガチャ版）</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -75,6 +75,7 @@
         .kawaii-blue { background-color: #87ceeb; border-bottom-color: #5fbadd; }
         .kawaii-green { background-color: #98fb98; border-bottom-color: #6edb6e; }
         .kawaii-purple { background-color: #ccb3ff; border-bottom-color: #a680ff; }
+        .kawaii-orange { background-color: #ffb366; border-bottom-color: #ff9933; }
 
         .keypad-btn {
             font-size: 1.5rem;
@@ -99,25 +100,72 @@
         }
         .floating { animation: float 3s ease-in-out infinite; }
 
+        @keyframes gacha-shake {
+            0% { transform: rotate(0); }
+            25% { transform: rotate(10deg); }
+            50% { transform: rotate(0); }
+            75% { transform: rotate(-10deg); }
+            100% { transform: rotate(0); }
+        }
+        .gacha-shake { animation: gacha-shake 0.2s infinite; }
+
+        @keyframes pop-up {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .pop-up { animation: pop-up 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
         .scroll-hide::-webkit-scrollbar { display: none; }
         .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* 演算選択タイル */
+        .sticker-slot {
+            aspect-ratio: 1;
+            background: #fff;
+            border: 2px dashed #ffcce0;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        .sticker-slot.empty { opacity: 0.3; font-size: 1rem; color: #ffcce0; }
+
+        .confetti {
+            position: absolute;
+            top: -20px;
+            user-select: none;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* 演算選択タイル - 見切れ防止のスタイル */
         .op-tile {
             cursor: pointer;
-            transition: all 0.2s;
-            border: 3px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
         }
-        .op-tile input:checked + div {
+        .op-tile-inner {
+            border: 4px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+        /* 選択時の状態：scaleしても見切れないように親にpxを入れる必要がある */
+        .op-tile input:checked + .op-tile-inner {
             border-color: #ff99cc;
             background-color: #fff5f7;
-            transform: scale(1.05);
+            transform: scale(1.15); /* 少し大きめに */
+            z-index: 20; /* 前面に持ってくる */
+            box-shadow: 0 0 20px rgba(255, 153, 204, 0.4);
+        }
+        .op-tile input:checked + .op-tile-inner .text-gray-500 {
+            color: #ff85b3;
         }
     </style>
 </head>
 <body>
 
-    <div class="main-container">
+    <div class="main-container" id="confetti-container">
         <!-- 装飾 -->
         <div class="deco-icon text-3xl top-[5%] left-[5%] floating">✨</div>
         <div class="deco-icon text-4xl top-[8%] right-[8%] floating" style="animation-delay: 1s;">💖</div>
@@ -128,42 +176,59 @@
             
             <!-- 設定画面 -->
             <div id="settings-screen" class="h-full flex flex-col p-5">
+                <div class="flex justify-between items-start mb-4 flex-shrink-0">
+                    <div class="flex flex-col">
+                        <div class="flex items-center space-x-2">
+                            <span class="bg-pink-400 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">Lv. <span id="display-level">1</span></span>
+                            <div class="w-24 h-2 bg-gray-100 rounded-full overflow-hidden border border-pink-100">
+                                <div id="display-xp-bar" class="h-full bg-pink-400" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center mt-1 space-x-2">
+                            <span class="text-[10px] text-pink-300 font-bold">XP: <span id="display-xp">0</span></span>
+                            <span class="text-[10px] text-orange-400 font-bold">🎫: <span id="display-tickets">0</span></span>
+                        </div>
+                    </div>
+                    <button id="open-record-btn" class="text-xs bg-white border-2 border-pink-200 text-pink-400 font-bold px-3 py-1 rounded-full shadow-sm active:scale-95 transition">
+                        がんばり記録 📒
+                    </button>
+                </div>
+
                 <div class="text-center mb-4 flex-shrink-0">
-                    <span class="text-4xl">🎀</span>
-                    <h1 class="text-2xl font-extrabold text-gray-700 mt-1">さんすうれんしゅう</h1>
+                    <h1 class="text-2xl font-extrabold text-gray-700">さんすうれんしゅう</h1>
                 </div>
 
                 <div class="flex-grow overflow-y-auto scroll-hide space-y-5 pb-4">
-                    <!-- 1. 演算選択 -->
+                    <!-- 1. 演算選択 (見切れ防止のため左右にpx-3を追加) -->
                     <div class="space-y-3">
-                        <h2 class="text-lg font-bold text-gray-600 flex items-center">
+                        <h2 class="text-lg font-bold text-gray-600 flex items-center px-1">
                             <span class="mr-2">🍭</span> なにを お勉強する？
                         </h2>
-                        <div class="grid grid-cols-4 gap-2">
+                        <div class="grid grid-cols-4 gap-3 px-3 py-2">
                             <label class="op-tile">
                                 <input type="radio" name="operation" value="add" class="hidden">
-                                <div class="bg-[#f0f4ff] p-3 rounded-2xl text-center">
+                                <div class="op-tile-inner bg-[#f0f4ff] p-3 rounded-2xl text-center">
                                     <div class="text-2xl mb-1">➕</div>
                                     <div class="text-[10px] font-bold text-gray-500">たしざん</div>
                                 </div>
                             </label>
                             <label class="op-tile">
                                 <input type="radio" name="operation" value="sub" class="hidden">
-                                <div class="bg-[#fff5f7] p-3 rounded-2xl text-center">
+                                <div class="op-tile-inner bg-[#fff5f7] p-3 rounded-2xl text-center">
                                     <div class="text-2xl mb-1">➖</div>
                                     <div class="text-[10px] font-bold text-gray-500">ひきざん</div>
                                 </div>
                             </label>
                             <label class="op-tile">
                                 <input type="radio" name="operation" value="mul" class="hidden" checked>
-                                <div class="bg-[#f5fff0] p-3 rounded-2xl text-center">
+                                <div class="op-tile-inner bg-[#f5fff0] p-3 rounded-2xl text-center">
                                     <div class="text-2xl mb-1">✖️</div>
                                     <div class="text-[10px] font-bold text-gray-500">かけざん</div>
                                 </div>
                             </label>
                             <label class="op-tile">
                                 <input type="radio" name="operation" value="div" class="hidden">
-                                <div class="bg-[#fdfcf0] p-3 rounded-2xl text-center">
+                                <div class="op-tile-inner bg-[#fdfcf0] p-3 rounded-2xl text-center">
                                     <div class="text-2xl mb-1">➗</div>
                                     <div class="text-[10px] font-bold text-gray-500">わりざん</div>
                                 </div>
@@ -173,24 +238,21 @@
 
                     <!-- 2. モード選択 -->
                     <div class="space-y-3">
-                        <h2 class="text-lg font-bold text-gray-600 flex items-center">
+                        <h2 class="text-lg font-bold text-gray-600 flex items-center px-1">
                             <span class="mr-2">🧩</span> もんだいの 出しかた
                         </h2>
-                        <div class="grid grid-cols-1 gap-2">
+                        <div class="grid grid-cols-1 gap-2 px-1">
                             <label class="flex items-center p-3 border-2 border-[#ccebff] bg-[#eef9ff] rounded-2xl cursor-pointer shadow-sm">
                                 <input type="radio" name="mode" value="all" class="w-5 h-5 accent-[#87ceeb]" checked>
                                 <span class="ml-3 text-base text-gray-700 font-bold">ぜんぶ シャッフル！</span>
                             </label>
-                            
                             <label class="block p-3 border-2 border-[#d4fcd9] bg-[#f2fff5] rounded-2xl cursor-pointer shadow-sm">
                                 <div class="flex items-center">
                                     <input type="radio" name="mode" value="dan" class="w-5 h-5 accent-[#98fb98]">
-                                    <span class="ml-3 text-base text-gray-700 font-bold" id="dan-mode-label">「だん」を えらぶ</span>
+                                    <span class="ml-3 text-base text-gray-700 font-bold" id="dan-mode-label">「たす数」を えらぶ</span>
                                 </div>
                                 <div id="dan-selector" class="mt-2 hidden">
-                                    <select id="dan-select" class="w-full p-2 border-2 border-[#d4fcd9] rounded-xl text-base font-bold bg-white outline-none text-gray-700">
-                                        <!-- JS -->
-                                    </select>
+                                    <select id="dan-select" class="w-full p-2 border-2 border-[#d4fcd9] rounded-xl text-base font-bold bg-white outline-none text-gray-700"></select>
                                 </div>
                             </label>
                         </div>
@@ -198,10 +260,10 @@
 
                     <!-- 3. 順序選択 -->
                     <div class="space-y-3">
-                        <h2 class="text-lg font-bold text-gray-600 flex items-center">
+                        <h2 class="text-lg font-bold text-gray-600 flex items-center px-1">
                             <span class="mr-2">🎨</span> じゅんばん
                         </h2>
-                        <div class="flex space-x-2">
+                        <div class="flex space-x-2 px-1">
                             <label class="flex items-center justify-center flex-1 p-3 border-2 border-gray-100 bg-gray-50 rounded-2xl cursor-pointer">
                                 <input type="radio" name="order" value="sequential" class="w-4 h-4 accent-[#ff99cc]" checked>
                                 <span class="ml-2 text-sm text-gray-700 font-bold">じゅんばん</span>
@@ -222,7 +284,13 @@
             </div>
 
             <!-- クイズ画面 -->
-            <div id="quiz-screen" class="hidden h-full flex flex-col p-5">
+            <div id="quiz-screen" class="hidden h-full flex flex-col p-5 relative">
+                <div id="combo-display" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none hidden">
+                    <div class="bg-yellow-400 text-white font-black text-3xl px-6 py-2 rounded-full shadow-xl border-4 border-white combo-anim">
+                        <span id="combo-count">2</span> コンボ！
+                    </div>
+                </div>
+
                 <div class="flex justify-between items-center mb-3 flex-shrink-0">
                     <span class="text-pink-300 text-2xl">💖</span>
                     <div class="bg-[#eef9ff] px-4 py-1 rounded-full border-2 border-[#ccebff]">
@@ -231,7 +299,6 @@
                     <span class="text-pink-300 text-2xl">💖</span>
                 </div>
                 
-                <!-- 問題表示 -->
                 <div class="flex-grow flex flex-col justify-center items-center py-1">
                     <div class="w-full h-32 flex items-center justify-center bg-[#eef9ff] rounded-[2rem] border-4 border-[#ccebff] shadow-inner relative overflow-hidden">
                         <div class="absolute top-0 left-0 p-2 opacity-10 text-3xl">✨</div>
@@ -239,14 +306,12 @@
                     </div>
                 </div>
 
-                <!-- 回答入力エリア -->
                 <div class="my-3 flex-shrink-0">
                     <div class="bg-white border-4 border-[#ffeff2] rounded-2xl py-3 text-center shadow-sm">
                         <span id="answer-display" class="text-5xl font-black text-[#ff85b3]">？</span>
                     </div>
                 </div>
 
-                <!-- テンキーエリア -->
                 <div class="h-[42%] flex-shrink-0">
                     <div id="keypad" class="grid grid-cols-3 gap-2 h-full">
                         <button class="keypad-btn" data-val="1">1</button>
@@ -262,7 +327,6 @@
                         <button class="keypad-btn" data-val="0">0</button>
                         <button id="check-button" class="keypad-btn !bg-[#98fb98] !text-white !border-[#6edb6e] text-lg" data-val="Enter">OK</button>
                     </div>
-
                     <div id="next-button-container" class="hidden h-full">
                         <button id="next-button" class="w-full h-full btn-base kawaii-blue text-3xl rounded-3xl shadow-lg">
                             つぎへ ➔
@@ -278,57 +342,264 @@
             </div>
 
             <!-- 結果画面 -->
-            <div id="results-screen" class="hidden h-full flex flex-col justify-between items-center py-8 px-5">
+            <div id="results-screen" class="hidden h-full flex flex-col justify-between items-center py-6 px-5 relative">
                 <div class="text-center">
                     <p class="text-6xl mb-2 floating">👑</p>
-                    <h1 class="text-3xl font-black text-[#ff85b3]">おめでとう！</h1>
+                    <h1 id="result-title" class="text-3xl font-black text-[#ff85b3]">おめでとう！</h1>
                 </div>
                 
-                <div class="w-52 h-52 bg-white border-8 border-dashed border-[#d4fcd9] rounded-full shadow-xl flex flex-col justify-center items-center">
-                    <p class="text-base text-gray-400 font-bold">スコア</p>
-                    <p id="final-score" class="text-5xl font-black text-[#7ad18a] mt-1">0 / 0</p>
+                <div class="flex flex-col items-center">
+                    <div class="w-48 h-48 bg-white border-8 border-dashed border-[#d4fcd9] rounded-full shadow-xl flex flex-col justify-center items-center relative">
+                        <p class="text-sm text-gray-400 font-bold">スコア</p>
+                        <p id="final-score" class="text-4xl font-black text-[#7ad18a] mt-1">0 / 0</p>
+                        <div id="perfect-badge" class="hidden absolute -top-4 -right-4 bg-yellow-400 text-white font-black px-3 py-1 rounded-full shadow-lg border-2 border-white transform rotate-12 text-xs">PERFECT! ✨</div>
+                    </div>
+                    <div id="ticket-get-box" class="hidden mt-4 flex flex-col items-center bg-orange-50 p-3 rounded-2xl border-2 border-orange-100">
+                        <p class="text-[10px] text-orange-400 font-bold mb-1">パーフェクト！ 🎫ゲット！</p>
+                        <div class="flex items-center space-x-1">
+                            <span class="text-2xl">🎫</span>
+                            <span class="text-xl font-bold text-orange-500">× 1</span>
+                        </div>
+                    </div>
                 </div>
                 
-                <button id="review-button" class="w-full py-4 btn-base kawaii-purple text-xl rounded-2xl shadow-xl">
-                    もういっかい！ 🎀
-                </button>
+                <div class="w-full space-y-2">
+                    <div class="text-center">
+                        <span class="text-xs font-bold text-pink-300">XP +<span id="gained-xp">0</span> ゲット！</span>
+                    </div>
+                    <button id="review-button" class="w-full py-4 btn-base kawaii-purple text-xl rounded-2xl shadow-xl">
+                        もういっかい！ 🎀
+                    </button>
+                </div>
+            </div>
+
+            <!-- がんばり記録画面 -->
+            <div id="record-screen" class="hidden h-full flex flex-col p-5 bg-[#fffdfd] overflow-hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-xl font-black text-gray-700">がんばり記録</h1>
+                    <button id="close-record-btn" class="text-gray-400 text-2xl font-bold px-2">×</button>
+                </div>
+
+                <div class="flex-grow overflow-y-auto scroll-hide space-y-8 pb-10 px-1">
+                    <!-- ガチャコーナー -->
+                    <div class="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-3xl border-4 border-white shadow-sm">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-base font-bold text-orange-500 flex items-center">
+                                <span class="mr-2">🎰</span> シールガチャ
+                            </h2>
+                            <div class="bg-white px-3 py-1 rounded-full border-2 border-orange-200">
+                                <span class="text-xs font-bold text-orange-500">🎫: <span id="record-tickets">0</span></span>
+                            </div>
+                        </div>
+                        
+                        <div id="gacha-machine" class="flex flex-col items-center py-4 bg-white rounded-2xl mb-4 relative overflow-hidden">
+                            <div id="gacha-animation-area" class="text-6xl mb-4">🔮</div>
+                            <p id="gacha-status" class="text-[10px] text-gray-400 font-bold">チケット1まいで 1回ひけるよ！</p>
+                            
+                            <div id="gacha-result-overlay" class="absolute inset-0 bg-white bg-opacity-95 flex flex-col items-center justify-center hidden">
+                                <div class="text-5xl mb-2 pop-up" id="gacha-result-icon">🍓</div>
+                                <p class="text-sm font-bold text-pink-400" id="gacha-result-text">あたらしいシール！</p>
+                                <button id="gacha-close-result" class="mt-4 px-4 py-1 bg-pink-100 text-pink-500 rounded-full text-xs font-bold">とじる</button>
+                            </div>
+                        </div>
+                        
+                        <button id="gacha-pull-btn" class="w-full py-3 btn-base kawaii-orange text-lg rounded-2xl shadow-md disabled:opacity-50 disabled:grayscale">
+                            ガチャをひく！ ✨
+                        </button>
+                    </div>
+
+                    <!-- レベルとXP -->
+                    <div class="bg-white p-4 rounded-3xl border-2 border-pink-50 shadow-sm">
+                        <div class="flex items-center space-x-4">
+                            <div class="bg-pink-400 w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-black">
+                                <span id="record-level">1</span>
+                            </div>
+                            <div class="flex-grow">
+                                <div class="flex justify-between items-end mb-1">
+                                    <span class="text-sm font-bold text-gray-600" id="record-rank">すうじの妖精</span>
+                                    <span class="text-[10px] text-gray-400 font-bold">あと <span id="next-level-xp">50</span> XP でアップ</span>
+                                </div>
+                                <div class="w-full h-4 bg-gray-100 rounded-full overflow-hidden border border-pink-50">
+                                    <div id="record-xp-bar" class="h-full bg-pink-400" style="width: 30%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- スタンプカード -->
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <h2 class="text-base font-bold text-gray-600 flex items-center">
+                                <span class="mr-2">⭐</span> スタンプカード
+                            </h2>
+                            <div id="weekly-reward-indicator" class="hidden text-[10px] bg-green-100 text-green-600 px-2 py-0.5 rounded-full font-bold">5こ達成！ 🎫+3 ゲット済み</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-3xl border-2 border-pink-50 shadow-sm flex justify-between px-4">
+                            <div class="flex flex-col items-center"><span class="stamp-slot text-2xl" id="stamp-0">⚪</span><span class="text-[8px] text-gray-300 mt-1">Sun</span></div>
+                            <div class="flex flex-col items-center"><span class="stamp-slot text-2xl" id="stamp-1">⚪</span><span class="text-[8px] text-gray-300 mt-1">Mon</span></div>
+                            <div class="flex flex-col items-center"><span class="stamp-slot text-2xl" id="stamp-2">⚪</span><span class="text-[8px] text-gray-300 mt-1">Tue</span></div>
+                            <div class="flex flex-col items-center"><span class="stamp-slot text-2xl" id="stamp-3">⚪</span><span class="text-[8px] text-gray-300 mt-1">Wed</span></div>
+                            <div class="flex flex-col items-center"><span class="stamp-slot text-2xl" id="stamp-4">⚪</span><span class="text-[8px] text-gray-300 mt-1">Thu</span></div>
+                            <div class="flex flex-col items-center"><span class="stamp-slot text-2xl" id="stamp-5">⚪</span><span class="text-[8px] text-gray-300 mt-1">Fri</span></div>
+                            <div class="flex flex-col items-center"><span class="stamp-slot text-2xl" id="stamp-6">⚪</span><span class="text-[8px] text-gray-300 mt-1">Sat</span></div>
+                        </div>
+                        <p id="weekly-status-text" class="text-[9px] text-center text-gray-400 font-bold">こんしゅう あと 3こ で チケット3まいもらえるよ！</p>
+                    </div>
+
+                    <!-- シール帳 -->
+                    <div class="space-y-3">
+                        <h2 class="text-base font-bold text-gray-600 flex items-center">
+                            <span class="mr-2">🍓</span> シール帳（50種類）
+                        </h2>
+                        <div id="sticker-grid" class="grid grid-cols-5 gap-2 bg-white p-4 rounded-3xl border-2 border-pink-50 shadow-sm"></div>
+                    </div>
+                </div>
             </div>
 
         </div>
     </div>
 
 <script>
-    const elements = {
-        settingsScreen: document.getElementById('settings-screen'),
-        quizScreen: document.getElementById('quiz-screen'),
-        resultsScreen: document.getElementById('results-screen'),
-        danSelect: document.getElementById('dan-select'),
-        danSelector: document.getElementById('dan-selector'),
-        danModeLabel: document.getElementById('dan-mode-label'),
-        startButton: document.getElementById('start-button'),
-        problemText: document.getElementById('problem-text'),
-        answerDisplay: document.getElementById('answer-display'),
-        checkButton: document.getElementById('check-button'),
-        nextButton: document.getElementById('next-button'),
-        nextButtonContainer: document.getElementById('next-button-container'),
-        progressText: document.getElementById('progress-text'),
-        finalScore: document.getElementById('final-score'),
-        reviewButton: document.getElementById('review-button'),
-        resetQuizButton: document.getElementById('reset-quiz-button'),
-        keypad: document.getElementById('keypad'),
-        modeOptions: document.getElementsByName('mode'),
-        orderOptions: document.getElementsByName('order'),
-        operationOptions: document.getElementsByName('operation')
+    // --- 定数 ---
+    const FINAL_STICKERS = [
+        "🍓", "🎀", "🦄", "🍦", "🍭", "👑", "🧸", "🎨", "🌈", "🪄", 
+        "🍪", "🌟", "🐱", "🐶", "🍒", "💎", "🍎", "🍑", "🍊", "🍉", 
+        "🍇", "🥞", "🍩", "🧁", "🍮", "🍫", "🍰", "🥨", "🍬", "🍨", 
+        "🍿", "🥤", "🍙", "🍡", "🐼", "🎈", "🎊", "🎁", "👗", "💄", 
+        "💍", "🎒", "👒", "🌸", "🌷", "🌼", "🌻", "🍀", "🦋", "🐰"
+    ];
+    const SAVE_KEY = "kawaii_arithmetic_save_v2";
+
+    // --- 状態 ---
+    let userData = {
+        xp: 0,
+        level: 1,
+        tickets: 0,
+        stickers: [], 
+        stamps: [],
+        claimedWeeklyBonus: "" 
     };
 
     let quizState = {
         problems: [],
         currentIndex: 0,
         correctCount: 0,
+        currentCombo: 0,
         isAwaitingNext: false,
-        currentInput: "",
-        settings: { op: 'mul', mode: 'all', dan: 1, order: 'sequential' }
+        currentInput: ""
     };
+
+    // --- DOM要素 ---
+    let elements = {};
+
+    // --- コア機能 ---
+    function showScreen(screenName) {
+        [elements.settingsScreen, elements.quizScreen, elements.resultsScreen, elements.recordScreen].forEach(s => s.classList.add('hidden'));
+        if (screenName === 'settings') elements.settingsScreen.classList.remove('hidden');
+        if (screenName === 'quiz') elements.quizScreen.classList.remove('hidden');
+        if (screenName === 'results') elements.resultsScreen.classList.remove('hidden');
+        if (screenName === 'record') elements.recordScreen.classList.remove('hidden');
+    }
+
+    function loadData() {
+        const saved = localStorage.getItem(SAVE_KEY);
+        if (saved) userData = JSON.parse(saved);
+        if (userData.tickets === undefined) userData.tickets = 0;
+        if (userData.claimedWeeklyBonus === undefined) userData.claimedWeeklyBonus = "";
+        updateTopBar();
+        checkWeeklyStamps();
+    }
+
+    function saveData() {
+        localStorage.setItem(SAVE_KEY, JSON.stringify(userData));
+    }
+
+    function updateTopBar() {
+        elements.displayXP.textContent = userData.xp;
+        elements.displayLevel.textContent = userData.level;
+        elements.displayTickets.textContent = userData.tickets;
+        const currentXPInLevel = userData.xp % 100;
+        elements.displayXPBar.style.width = `${currentXPInLevel}%`;
+    }
+
+    function awardTicket(count = 1) {
+        userData.tickets += count;
+        saveData();
+        updateTopBar();
+    }
+
+    function getWeekIdentifier(date) {
+        const d = new Date(date);
+        d.setHours(0,0,0,0);
+        d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+        const yearStart = new Date(d.getFullYear(),0,1);
+        const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        return d.getFullYear() + "-" + weekNo;
+    }
+
+    function checkWeeklyStamps() {
+        const now = new Date();
+        const startOfWeek = new Date(now);
+        startOfWeek.setDate(now.getDate() - now.getDay());
+        startOfWeek.setHours(0,0,0,0);
+        const weekId = getWeekIdentifier(now);
+        const stampsThisWeek = userData.stamps.filter(s => new Date(s) >= startOfWeek).length;
+
+        if (stampsThisWeek >= 5 && userData.claimedWeeklyBonus !== weekId) {
+            userData.claimedWeeklyBonus = weekId;
+            awardTicket(3);
+        }
+
+        const isClaimed = userData.claimedWeeklyBonus === weekId;
+        elements.weeklyRewardIndicator.classList.toggle('hidden', !isClaimed);
+        elements.weeklyStatusText.textContent = isClaimed ? "今週のボーナスは ゲット済みだよ！" : `今週 あと ${Math.max(0, 5 - stampsThisWeek)}回 あそぶと チケット3まいもらえるよ！`;
+        
+        for (let i = 0; i < 7; i++) {
+            const date = new Date(startOfWeek);
+            date.setDate(startOfWeek.getDate() + i);
+            const dateStr = date.toISOString().split('T')[0];
+            const slot = document.getElementById(`stamp-${i}`);
+            slot.textContent = userData.stamps.includes(dateStr) ? "🌸" : "⚪";
+            slot.style.opacity = userData.stamps.includes(dateStr) ? "1" : "0.3";
+        }
+    }
+
+    function addXP(amount) {
+        const oldLevel = userData.level;
+        userData.xp += amount;
+        userData.level = Math.floor(userData.xp / 100) + 1;
+        if (userData.level > oldLevel) awardTicket(userData.level - oldLevel);
+        saveData();
+        updateTopBar();
+    }
+
+    function pullGacha() {
+        if (userData.tickets <= 0) return;
+        userData.tickets--;
+        saveData();
+        updateTopBar();
+        elements.recordTickets.textContent = userData.tickets;
+        elements.gachaPullBtn.disabled = true;
+        elements.gachaAnimArea.textContent = "📦";
+        elements.gachaAnimArea.classList.add('gacha-shake');
+        elements.gachaStatus.textContent = "なにが でるかな...？";
+
+        setTimeout(() => {
+            elements.gachaAnimArea.classList.remove('gacha-shake');
+            elements.gachaAnimArea.textContent = "💥";
+            setTimeout(() => {
+                const randomIndex = Math.floor(Math.random() * FINAL_STICKERS.length);
+                const isNew = !userData.stickers.includes(randomIndex);
+                if (isNew) {
+                    userData.stickers.push(randomIndex);
+                    saveData();
+                }
+                elements.gachaResultIcon.textContent = FINAL_STICKERS[randomIndex];
+                elements.gachaResultText.textContent = isNew ? "あたらしいシール！✨" : "もってるシールだったよ🧸";
+                elements.gachaResultOverlay.classList.remove('hidden');
+            }, 500);
+        }, 1200);
+    }
 
     function shuffleArray(array) {
         let newArray = [...array];
@@ -339,114 +610,72 @@
         return newArray;
     }
 
-    function showScreen(screenName) {
-        elements.settingsScreen.classList.add('hidden');
-        elements.quizScreen.classList.add('hidden');
-        elements.resultsScreen.classList.add('hidden');
-        if (screenName === 'settings') elements.settingsScreen.classList.remove('hidden');
-        if (screenName === 'quiz') elements.quizScreen.classList.remove('hidden');
-        if (screenName === 'results') elements.resultsScreen.classList.remove('hidden');
-    }
-
-    function updateDanLabel() {
-        const op = Array.from(elements.operationOptions).find(r => r.checked).value;
-        const labels = {
-            'add': '「たす数」を えらぶ',
-            'sub': '「ひく数」を えらぶ',
-            'mul': '「だん」を えらぶ',
-            'div': '「わる数」を えらぶ'
-        };
-        elements.danModeLabel.textContent = labels[op] || '「かず」を えらぶ';
-    }
-
-    function toggleDanSelector() {
-        const isDanMode = Array.from(elements.modeOptions).find(r => r.checked).value === 'dan';
-        elements.danSelector.classList.toggle('hidden', !isDanMode);
-    }
-
     function generateProblems() {
-        const op = Array.from(elements.operationOptions).find(r => r.checked).value;
-        const mode = Array.from(elements.modeOptions).find(r => r.checked).value;
-        const order = Array.from(elements.orderOptions).find(r => r.checked).value;
+        const op = document.querySelector('input[name="operation"]:checked').value;
+        const mode = document.querySelector('input[name="mode"]:checked').value;
+        const order = document.querySelector('input[name="order"]:checked').value;
         const dan = parseInt(elements.danSelect.value, 10);
-        
         let p = [];
         const range = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
         if (op === 'mul') {
             const targets = mode === 'dan' ? [dan] : range;
-            targets.forEach(n1 => {
-                range.forEach(n2 => p.push({ n1, n2, op: '×', ans: n1 * n2 }));
-            });
+            targets.forEach(n1 => range.forEach(n2 => p.push({ n1, n2, op: '×', ans: n1 * n2 })));
         } else if (op === 'add') {
             const targets = mode === 'dan' ? [dan] : range;
-            targets.forEach(n1 => {
-                range.forEach(n2 => p.push({ n1, n2, op: '＋', ans: n1 + n2 }));
-            });
+            targets.forEach(n1 => range.forEach(n2 => p.push({ n1, n2, op: '＋', ans: n1 + n2 })));
         } else if (op === 'sub') {
             const targets = mode === 'dan' ? [dan] : range;
-            targets.forEach(n2 => {
-                range.forEach(ans => {
-                    const n1 = ans + n2;
-                    p.push({ n1, n2, op: '－', ans });
-                });
-            });
+            targets.forEach(n2 => range.forEach(ans => p.push({ n1: ans + n2, n2, op: '－', ans })));
         } else if (op === 'div') {
             const targets = mode === 'dan' ? [dan] : range;
-            targets.forEach(n2 => {
-                range.forEach(ans => {
-                    const n1 = ans * n2;
-                    p.push({ n1, n2, op: '÷', ans });
-                });
-            });
+            targets.forEach(n2 => range.forEach(ans => p.push({ n1: ans * n2, n2, op: '÷', ans })));
         }
         
-        // 「全部をシャッフル」の場合の処理
         if (mode === 'all') {
-            // 全組み合わせからランダムに10個抽出
             p = shuffleArray(p).slice(0, 10);
-            // 順序が「じゅんばん」なら並び替える
-            if (order === 'sequential') {
-                p.sort((a, b) => (a.n1 - b.n1) || (a.n2 - b.n2));
-            }
-        } else {
-            // モードが「特定の数（だん）」の場合
-            if (order === 'random') p = shuffleArray(p);
+            if (order === 'sequential') p.sort((a, b) => (a.n1 - b.n1) || (a.n2 - b.n2));
+        } else if (order === 'random') {
+            p = shuffleArray(p);
         }
         
         quizState.problems = p;
         quizState.currentIndex = 0;
         quizState.correctCount = 0;
+        quizState.currentCombo = 0;
     }
 
     function displayCurrentProblem() {
         const problem = quizState.problems[quizState.currentIndex];
         if (!problem) return;
-
         quizState.currentInput = "";
         elements.answerDisplay.textContent = "？";
         elements.answerDisplay.style.color = "#ff85b3";
         elements.keypad.classList.remove('hidden');
         elements.nextButtonContainer.classList.add('hidden');
-        
         elements.problemText.textContent = `${problem.n1} ${problem.op} ${problem.n2}`;
         elements.progressText.textContent = `${quizState.currentIndex + 1} / ${quizState.problems.length}`;
     }
 
     function checkAnswer() {
         if (quizState.isAwaitingNext || quizState.currentInput === "") return;
-        
         const problem = quizState.problems[quizState.currentIndex];
         const userAnswer = parseInt(quizState.currentInput, 10);
-
         elements.keypad.classList.add('hidden');
         elements.nextButtonContainer.classList.remove('hidden');
 
         if (userAnswer === problem.ans) {
             quizState.correctCount++;
+            quizState.currentCombo++;
             elements.answerDisplay.textContent = "○ せいかい！";
             elements.answerDisplay.style.color = "#7ad18a";
+            if (quizState.currentCombo >= 2) {
+                elements.comboCount.textContent = quizState.currentCombo;
+                elements.comboDisplay.classList.remove('hidden');
+                setTimeout(() => elements.comboDisplay.classList.add('hidden'), 800);
+            }
         } else {
+            quizState.currentCombo = 0;
             elements.answerDisplay.textContent = `× こたえ:${problem.ans}`;
             elements.answerDisplay.style.color = "#ff85b3";
         }
@@ -459,33 +688,132 @@
         if (quizState.currentIndex < quizState.problems.length) {
             displayCurrentProblem();
         } else {
-            elements.finalScore.textContent = `${quizState.correctCount} / ${quizState.problems.length}`;
-            showScreen('results');
+            finishQuiz();
         }
     }
 
-    function handleKeypadPress(val) {
-        if (quizState.isAwaitingNext) return;
-        
-        if (val === 'C') {
-            quizState.currentInput = "";
-            elements.answerDisplay.textContent = "？";
-        } else if (val === 'Enter') {
-            if (quizState.currentInput !== "") checkAnswer();
-        } else {
-            if (quizState.currentInput.length < 3) {
-                quizState.currentInput += val;
-                elements.answerDisplay.textContent = quizState.currentInput;
-            }
+    function triggerConfetti() {
+        const emojis = ["✨", "💖", "🎀", "🌟", "🌸", "🧁"];
+        for (let i = 0; i < 40; i++) {
+            const el = document.createElement('div');
+            el.className = 'confetti';
+            el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            el.style.left = Math.random() * 100 + 'vw';
+            el.style.fontSize = (Math.random() * 20 + 20) + 'px';
+            el.style.transition = `all ${Math.random() * 2 + 2}s linear`;
+            elements.confettiContainer.appendChild(el);
+            setTimeout(() => {
+                el.style.transform = `translateY(${window.innerHeight + 100}px) rotate(${Math.random() * 360}deg)`;
+                el.style.opacity = '0';
+            }, 10);
+            setTimeout(() => el.remove(), 4000);
         }
+    }
+
+    function finishQuiz() {
+        const total = quizState.problems.length;
+        const correct = quizState.correctCount;
+        const isPerfect = (correct === total);
+        let xpGained = correct * 5;
+        if (isPerfect) xpGained += 20;
+        addXP(xpGained);
+
+        elements.finalScore.textContent = `${correct} / ${total}`;
+        elements.gainedXP.textContent = xpGained;
+
+        if (isPerfect) {
+            elements.perfectBadge.classList.remove('hidden');
+            elements.ticketGetBox.classList.remove('hidden');
+            awardTicket(1);
+            triggerConfetti();
+        } else {
+            elements.perfectBadge.classList.add('hidden');
+            elements.ticketGetBox.classList.add('hidden');
+        }
+
+        const todayStr = new Date().toISOString().split('T')[0];
+        if (!userData.stamps.includes(todayStr)) {
+            userData.stamps.push(todayStr);
+            saveData();
+            checkWeeklyStamps();
+        }
+        showScreen('results');
+    }
+
+    function updateRecordUI() {
+        elements.recordLevel.textContent = userData.level;
+        elements.recordRank.textContent = userData.level < 5 ? "すうじの妖精" : userData.level < 10 ? "さんすう見習い" : userData.level < 20 ? "計算のプリンセス" : "さんすうマスター ✨";
+        elements.recordXPBar.style.width = `${userData.xp % 100}%`;
+        elements.nextLevelXP.textContent = 100 - (userData.xp % 100);
+        elements.recordTickets.textContent = userData.tickets;
+        elements.gachaPullBtn.disabled = userData.tickets <= 0;
+        elements.stickerGrid.innerHTML = "";
+        FINAL_STICKERS.forEach((emoji, idx) => {
+            const slot = document.createElement('div');
+            slot.className = userData.stickers.includes(idx) ? "sticker-slot" : "sticker-slot empty";
+            slot.textContent = userData.stickers.includes(idx) ? emoji : "?";
+            elements.stickerGrid.appendChild(slot);
+        });
+        checkWeeklyStamps();
     }
 
     function initialize() {
+        // 全ての要素を取得
+        elements = {
+            settingsScreen: document.getElementById('settings-screen'),
+            quizScreen: document.getElementById('quiz-screen'),
+            resultsScreen: document.getElementById('results-screen'),
+            recordScreen: document.getElementById('record-screen'),
+            danSelect: document.getElementById('dan-select'),
+            danSelector: document.getElementById('dan-selector'),
+            danModeLabel: document.getElementById('dan-mode-label'),
+            startButton: document.getElementById('start-button'),
+            problemText: document.getElementById('problem-text'),
+            answerDisplay: document.getElementById('answer-display'),
+            checkButton: document.getElementById('check-button'),
+            nextButton: document.getElementById('next-button'),
+            nextButtonContainer: document.getElementById('next-button-container'),
+            progressText: document.getElementById('progress-text'),
+            finalScore: document.getElementById('final-score'),
+            reviewButton: document.getElementById('review-button'),
+            resetQuizButton: document.getElementById('reset-quiz-button'),
+            keypad: document.getElementById('keypad'),
+            openRecordBtn: document.getElementById('open-record-btn'),
+            closeRecordBtn: document.getElementById('close-record-btn'),
+            displayXP: document.getElementById('display-xp'),
+            displayLevel: document.getElementById('display-level'),
+            displayTickets: document.getElementById('display-tickets'),
+            displayXPBar: document.getElementById('display-xp-bar'),
+            recordLevel: document.getElementById('record-level'),
+            recordRank: document.getElementById('record-rank'),
+            recordXPBar: document.getElementById('record-xp-bar'),
+            nextLevelXP: document.getElementById('next-level-xp'),
+            stickerGrid: document.getElementById('sticker-grid'),
+            perfectBadge: document.getElementById('perfect-badge'),
+            ticketGetBox: document.getElementById('ticket-get-box'),
+            gainedXP: document.getElementById('gained-xp'),
+            comboDisplay: document.getElementById('combo-display'),
+            comboCount: document.getElementById('combo-count'),
+            confettiContainer: document.getElementById('confetti-container'),
+            gachaMachine: document.getElementById('gacha-machine'),
+            gachaAnimArea: document.getElementById('gacha-animation-area'),
+            gachaPullBtn: document.getElementById('gacha-pull-btn'),
+            recordTickets: document.getElementById('record-tickets'),
+            gachaResultOverlay: document.getElementById('gacha-result-overlay'),
+            gachaResultIcon: document.getElementById('gacha-result-icon'),
+            gachaResultText: document.getElementById('gacha-result-text'),
+            gachaCloseResult: document.getElementById('gacha-close-result'),
+            weeklyRewardIndicator: document.getElementById('weekly-reward-indicator'),
+            weeklyStatusText: document.getElementById('weekly-status-text')
+        };
+
         for (let i = 1; i <= 9; i++) {
             const opt = document.createElement('option');
             opt.value = i; opt.textContent = `${i} のかず`;
             elements.danSelect.appendChild(opt);
         }
+        
+        loadData();
 
         elements.startButton.addEventListener('click', () => {
             generateProblems();
@@ -493,22 +821,44 @@
             displayCurrentProblem();
         });
 
-        Array.from(elements.modeOptions).forEach(r => r.addEventListener('change', toggleDanSelector));
-        Array.from(elements.operationOptions).forEach(r => r.addEventListener('change', updateDanLabel));
+        document.getElementsByName('mode').forEach(r => r.addEventListener('change', () => {
+            elements.danSelector.classList.toggle('hidden', r.value !== 'dan');
+        }));
+
+        document.getElementsByName('operation').forEach(r => r.addEventListener('change', () => {
+            const labels = {'add': 'たす数', 'sub': 'ひく数', 'mul': 'だん', 'div': 'わり数'};
+            elements.danModeLabel.textContent = `「${labels[r.value]}」を えらぶ`;
+        }));
 
         elements.nextButton.addEventListener('click', nextProblem);
         elements.reviewButton.addEventListener('click', () => showScreen('settings'));
         elements.resetQuizButton.addEventListener('click', () => showScreen('settings'));
+        elements.openRecordBtn.addEventListener('click', () => { updateRecordUI(); showScreen('record'); });
+        elements.closeRecordBtn.addEventListener('click', () => showScreen('settings'));
+        elements.gachaPullBtn.addEventListener('click', pullGacha);
+        elements.gachaCloseResult.addEventListener('click', () => {
+            elements.gachaResultOverlay.classList.add('hidden');
+            elements.gachaAnimArea.textContent = "🔮";
+            elements.gachaStatus.textContent = "チケット1まいで 1回ひけるよ！";
+            updateRecordUI();
+        });
 
         elements.keypad.addEventListener('click', (e) => {
             const btn = e.target.closest('button');
-            if (!btn) return;
-            handleKeypadPress(btn.dataset.val);
+            if (!btn || quizState.isAwaitingNext) return;
+            const val = btn.dataset.val;
+            if (val === 'C') {
+                quizState.currentInput = "";
+                elements.answerDisplay.textContent = "？";
+            } else if (val === 'Enter') {
+                if (quizState.currentInput !== "") checkAnswer();
+            } else if (quizState.currentInput.length < 3) {
+                quizState.currentInput += val;
+                elements.answerDisplay.textContent = quizState.currentInput;
+            }
         });
 
         showScreen('settings');
-        toggleDanSelector();
-        updateDanLabel();
     }
 
     window.onload = initialize;
