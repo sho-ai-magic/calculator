@@ -166,6 +166,19 @@
             100% { transform: scale(1) rotate(0); opacity: 1; }
         }
         .combo-anim { animation: combo-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+        /* 確認モーダルのスタイル */
+        .modal-overlay {
+            position: absolute;
+            inset: 0;
+            background-color: rgba(255, 182, 193, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
     </style>
 </head>
 <body>
@@ -376,6 +389,25 @@
                         もういっかい！ 🎀
                     </button>
                 </div>
+
+                <!-- ガチャ確認モーダル (結果画面の上に重ねる) -->
+                <div id="gacha-confirm-modal" class="modal-overlay hidden">
+                    <div class="bg-white p-6 rounded-[2.5rem] border-4 border-orange-200 shadow-2xl w-full text-center space-y-6 pop-up">
+                        <div class="text-5xl">🎫✨</div>
+                        <div>
+                            <p class="text-lg font-black text-gray-700">ガチャチケットを<br>ゲットしたよ！</p>
+                            <p class="text-sm font-bold text-orange-400 mt-2">いますぐ ガチャを<br>ひきにいく？</p>
+                        </div>
+                        <div class="flex flex-col space-y-3">
+                            <button id="confirm-gacha-yes" class="w-full py-4 btn-base kawaii-orange text-xl rounded-2xl shadow-md">
+                                ひきにいく！ ✨
+                            </button>
+                            <button id="confirm-gacha-no" class="w-full py-2 text-sm font-bold text-gray-400 hover:text-gray-600">
+                                あとでにする 🧸
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Record Screen -->
@@ -466,7 +498,7 @@
         "🍓", "🎀", "🦄", "🍦", "🍭", "👑", "🧸", "🎨", "🌈", "🪄", 
         "🍪", "🌟", "🐱", "🐶", "🍒", "💎", "🍎", "🍑", "🍊", "🍉", 
         "🍇", "🥞", "🍩", "🧁", "🍮", "🍫", "🍰", "🥨", "🍬", "🍨", 
-        "🍿", "🥤", "🍙", "🍡", "🐼", "🎈", "🎊", "🎁", "👗", "💄", 
+        " popcorn", "🥤", "🍙", "🍡", "🐼", "🎈", "🎊", "🎁", "👗", "💄", 
         "💍", "🎒", "👒", "🌸", "🌷", "🌼", "🌻", "🍀", "🦋", "🐰"
     ];
     const SAVE_KEY = "kawaii_arithmetic_save_v2";
@@ -740,6 +772,11 @@
             if (elements.ticketGetBox) elements.ticketGetBox.classList.remove('hidden');
             awardTicket(1);
             triggerConfetti();
+            
+            // ガチャ確認モーダルを表示
+            setTimeout(() => {
+                if (elements.gachaConfirmModal) elements.gachaConfirmModal.classList.remove('hidden');
+            }, 1000);
         } else {
             if (elements.perfectBadge) elements.perfectBadge.classList.add('hidden');
             if (elements.ticketGetBox) elements.ticketGetBox.classList.add('hidden');
@@ -790,7 +827,8 @@
             'combo-display', 'combo-count', 'confetti-container', 'gacha-machine',
             'gacha-animation-area', 'gacha-pull-btn', 'record-tickets',
             'gacha-result-overlay', 'gacha-result-icon', 'gacha-result-text',
-            'gacha-close-result', 'weekly-reward-indicator', 'weekly-status-text'
+            'gacha-close-result', 'weekly-reward-indicator', 'weekly-status-text',
+            'gacha-confirm-modal', 'confirm-gacha-yes', 'confirm-gacha-no'
         ];
         
         ids.forEach(id => {
@@ -843,6 +881,20 @@
                 if (elements.gachaStatus) elements.gachaStatus.textContent = "チケット1まいで 1回ひけるよ！";
                 updateRecordUI();
                 updateTopBar();
+            });
+        }
+
+        // ガチャ確認モーダルのボタンイベント
+        if (elements.confirmGachaYes) {
+            elements.confirmGachaYes.addEventListener('click', () => {
+                if (elements.gachaConfirmModal) elements.gachaConfirmModal.classList.add('hidden');
+                updateRecordUI();
+                showScreen('record');
+            });
+        }
+        if (elements.confirmGachaNo) {
+            elements.confirmGachaNo.addEventListener('click', () => {
+                if (elements.gachaConfirmModal) elements.gachaConfirmModal.classList.add('hidden');
             });
         }
 
