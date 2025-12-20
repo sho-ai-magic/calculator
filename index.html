@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>九九れんしゅう（Kawaiiスマホ完結版）</title>
+    <title>九九れんしゅう（Kawaiiバランス調整版）</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -18,7 +18,7 @@
         body {
             margin: 0;
             overflow: hidden;
-            touch-action: pan-y; /* スクロールは許可 */
+            touch-action: pan-y;
             background: linear-gradient(135deg, #fff5f7 0%, #f0f4ff 50%, #f5fff0 100%);
         }
 
@@ -32,7 +32,6 @@
             padding: 12px;
         }
 
-        /* 背景の装飾 */
         .deco-icon {
             position: absolute;
             z-index: 0;
@@ -50,11 +49,11 @@
             width: 100%;
             max-width: 420px;
             height: 100%;
-            max-height: 90vh;
+            max-height: 92vh;
             display: flex;
             flex-direction: column;
             box-shadow: 0 15px 40px rgba(255, 182, 193, 0.25);
-            overflow: hidden; /* カード自体ははみ出さない */
+            overflow: hidden;
         }
 
         /* ボタンデザイン */
@@ -86,7 +85,7 @@
             align-items: center;
             justify-content: center;
             height: 100%;
-            min-height: 50px;
+            min-height: 48px;
             border-bottom: 4px solid #ccebff;
         }
         .keypad-btn:active {
@@ -100,7 +99,6 @@
         }
         .floating { animation: float 3s ease-in-out infinite; }
 
-        /* スクロールバーのデザインを隠す */
         .scroll-hide::-webkit-scrollbar { display: none; }
         .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
@@ -118,13 +116,11 @@
             
             <!-- 設定画面 -->
             <div id="settings-screen" class="h-full flex flex-col p-5">
-                <!-- タイトルエリア -->
                 <div class="text-center mb-4 flex-shrink-0">
                     <span class="text-4xl">🎀</span>
                     <h1 class="text-2xl font-extrabold text-gray-700 mt-1">九九れんしゅう</h1>
                 </div>
 
-                <!-- スクロール可能なコンテンツエリア -->
                 <div class="flex-grow overflow-y-auto scroll-hide space-y-6 pb-4">
                     <div class="space-y-3">
                         <h2 class="text-lg font-bold text-gray-600 flex items-center">
@@ -167,7 +163,6 @@
                     </div>
                 </div>
 
-                <!-- スタートボタン (固定位置) -->
                 <div class="flex-shrink-0 pt-2 border-t border-pink-50">
                     <button id="start-button" class="w-full py-4 btn-base kawaii-pink text-xl rounded-2xl shadow-lg">
                         スタート！ ✨
@@ -177,14 +172,16 @@
 
             <!-- クイズ画面 -->
             <div id="quiz-screen" class="hidden h-full flex flex-col p-5">
-                <div class="flex justify-between items-center mb-2 flex-shrink-0">
-                    <span class="text-pink-300 text-xl">💖</span>
-                    <p id="progress-text" class="text-base text-[#70c1ff] font-bold"></p>
-                    <span class="text-pink-300 text-xl">💖</span>
+                <div class="flex justify-between items-center mb-3 flex-shrink-0">
+                    <span class="text-pink-300 text-2xl">💖</span>
+                    <div class="bg-[#eef9ff] px-4 py-1 rounded-full border-2 border-[#ccebff]">
+                        <p id="progress-text" class="text-xl text-[#70c1ff] font-extrabold tracking-widest"></p>
+                    </div>
+                    <span class="text-pink-300 text-2xl">💖</span>
                 </div>
                 
                 <!-- 問題表示 -->
-                <div class="flex-grow flex flex-col justify-center items-center py-2">
+                <div class="flex-grow flex flex-col justify-center items-center py-1">
                     <div class="w-full h-32 flex items-center justify-center bg-[#eef9ff] rounded-[2rem] border-4 border-[#ccebff] shadow-inner relative overflow-hidden">
                         <div class="absolute top-0 left-0 p-2 opacity-10 text-3xl">✨</div>
                         <p id="problem-text" class="text-5xl font-black text-gray-800 tracking-tighter">5 × 8</p>
@@ -199,7 +196,7 @@
                 </div>
 
                 <!-- テンキーエリア -->
-                <div class="h-[45%] flex-shrink-0">
+                <div class="h-[42%] flex-shrink-0">
                     <div id="keypad" class="grid grid-cols-3 gap-2 h-full">
                         <button class="keypad-btn" data-val="1">1</button>
                         <button class="keypad-btn" data-val="2">2</button>
@@ -222,8 +219,10 @@
                     </div>
                 </div>
 
-                <div class="text-center pt-2 flex-shrink-0">
-                    <button id="reset-quiz-button" class="text-[10px] text-gray-300 font-bold">設定にもどる</button>
+                <div class="text-center pt-3 flex-shrink-0">
+                    <button id="reset-quiz-button" class="inline-block px-6 py-1 text-sm text-pink-400 font-bold bg-pink-50 rounded-full border border-pink-100 hover:bg-pink-100 transition">
+                        設定にもどる 🧸
+                    </button>
                 </div>
             </div>
 
@@ -234,9 +233,9 @@
                     <h1 class="text-3xl font-black text-[#ff85b3]">おめでとう！</h1>
                 </div>
                 
-                <div class="w-48 h-48 bg-white border-8 border-dashed border-[#d4fcd9] rounded-full shadow-xl flex flex-col justify-center items-center">
-                    <p class="text-sm text-gray-500 font-bold">スコア</p>
-                    <p id="final-score" class="text-4xl font-black text-[#7ad18a] mt-1">0 / 0</p>
+                <div class="w-52 h-52 bg-white border-8 border-dashed border-[#d4fcd9] rounded-full shadow-xl flex flex-col justify-center items-center">
+                    <p class="text-base text-gray-400 font-bold">スコア</p>
+                    <p id="final-score" class="text-5xl font-black text-[#7ad18a] mt-1">0 / 0</p>
                 </div>
                 
                 <button id="review-button" class="w-full py-4 btn-base kawaii-purple text-xl rounded-2xl shadow-xl">
