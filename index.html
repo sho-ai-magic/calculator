@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>さんすうれんしゅう（ガチャ版）</title>
+    <title>さんすうれんしゅう</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -152,9 +152,9 @@
         .op-tile input:checked + .op-tile-inner {
             border-color: #ff99cc;
             background-color: #fff5f7;
-            transform: scale(1.15);
+            transform: scale(1.1);
             z-index: 20;
-            box-shadow: 0 0 20px rgba(255, 153, 204, 0.4);
+            box-shadow: 0 0 15px rgba(255, 153, 204, 0.3);
         }
         .op-tile input:checked + .op-tile-inner .text-gray-500 {
             color: #ff85b3;
@@ -203,43 +203,45 @@
                     <h1 class="text-2xl font-extrabold text-gray-700">さんすうれんしゅう</h1>
                 </div>
 
-                <div class="flex-grow overflow-y-auto scroll-hide space-y-5 pb-4">
+                <div class="flex-grow overflow-y-auto scroll-hide space-y-5 pb-4 px-1">
+                    <!-- 1. 演算選択 -->
                     <div class="space-y-3">
                         <h2 class="text-lg font-bold text-gray-600 flex items-center px-1">
                             <span class="mr-2">🍭</span> なにを お勉強する？
                         </h2>
-                        <div class="grid grid-cols-4 gap-3 px-3 py-2">
+                        <div class="grid grid-cols-4 gap-2 px-1 py-2">
                             <label class="op-tile">
                                 <input type="radio" name="operation" value="add" class="hidden">
-                                <div class="op-tile-inner bg-[#f0f4ff] p-3 rounded-2xl text-center">
+                                <div class="op-tile-inner bg-[#f0f4ff] px-1 py-3 rounded-2xl text-center">
                                     <div class="text-2xl mb-1">➕</div>
-                                    <div class="text-[10px] font-bold text-gray-500">たしざん</div>
+                                    <div class="text-[10px] font-bold text-gray-500 whitespace-nowrap">たしざん</div>
                                 </div>
                             </label>
                             <label class="op-tile">
                                 <input type="radio" name="operation" value="sub" class="hidden">
-                                <div class="op-tile-inner bg-[#fff5f7] p-3 rounded-2xl text-center">
+                                <div class="op-tile-inner bg-[#fff5f7] px-1 py-3 rounded-2xl text-center">
                                     <div class="text-2xl mb-1">➖</div>
-                                    <div class="text-[10px] font-bold text-gray-500">ひきざん</div>
+                                    <div class="text-[10px] font-bold text-gray-500 whitespace-nowrap">ひきざん</div>
                                 </div>
                             </label>
                             <label class="op-tile">
                                 <input type="radio" name="operation" value="mul" class="hidden" checked>
-                                <div class="op-tile-inner bg-[#f5fff0] p-3 rounded-2xl text-center">
+                                <div class="op-tile-inner bg-[#f5fff0] px-1 py-3 rounded-2xl text-center">
                                     <div class="text-2xl mb-1">✖️</div>
-                                    <div class="text-[10px] font-bold text-gray-500">かけざん</div>
+                                    <div class="text-[10px] font-bold text-gray-500 whitespace-nowrap">かけざん</div>
                                 </div>
                             </label>
                             <label class="op-tile">
                                 <input type="radio" name="operation" value="div" class="hidden">
-                                <div class="op-tile-inner bg-[#fdfcf0] p-3 rounded-2xl text-center">
+                                <div class="op-tile-inner bg-[#fdfcf0] px-1 py-3 rounded-2xl text-center">
                                     <div class="text-2xl mb-1">➗</div>
-                                    <div class="text-[10px] font-bold text-gray-500">わりざん</div>
+                                    <div class="text-[10px] font-bold text-gray-500 whitespace-nowrap">わりざん</div>
                                 </div>
                             </label>
                         </div>
                     </div>
 
+                    <!-- 2. モード選択 -->
                     <div class="space-y-3">
                         <h2 class="text-lg font-bold text-gray-600 flex items-center px-1">
                             <span class="mr-2">🧩</span> もんだいの 出しかた
@@ -247,12 +249,12 @@
                         <div class="grid grid-cols-1 gap-2 px-1">
                             <label class="flex items-center p-3 border-2 border-[#ccebff] bg-[#eef9ff] rounded-2xl cursor-pointer shadow-sm">
                                 <input type="radio" name="mode" value="all" class="w-5 h-5 accent-[#87ceeb]" checked>
-                                <span class="ml-3 text-base text-gray-700 font-bold">ぜんぶ シャッフル！</span>
+                                <span class="ml-3 text-base text-gray-700 font-bold whitespace-nowrap">ぜんぶ シャッフル！</span>
                             </label>
                             <label class="block p-3 border-2 border-[#d4fcd9] bg-[#f2fff5] rounded-2xl cursor-pointer shadow-sm">
                                 <div class="flex items-center">
                                     <input type="radio" name="mode" value="dan" class="w-5 h-5 accent-[#98fb98]">
-                                    <span class="ml-3 text-base text-gray-700 font-bold" id="dan-mode-label">「だん」を えらぶ</span>
+                                    <span class="ml-3 text-base text-gray-700 font-bold whitespace-nowrap" id="dan-mode-label">「だん」を えらぶ</span>
                                 </div>
                                 <div id="dan-selector" class="mt-2 hidden">
                                     <select id="dan-select" class="w-full p-2 border-2 border-[#d4fcd9] rounded-xl text-base font-bold bg-white outline-none text-gray-700"></select>
@@ -261,6 +263,7 @@
                         </div>
                     </div>
 
+                    <!-- 3. 順序選択 -->
                     <div class="space-y-3">
                         <h2 class="text-lg font-bold text-gray-600 flex items-center px-1">
                             <span class="mr-2">🎨</span> じゅんばん
@@ -268,11 +271,11 @@
                         <div class="flex space-x-2 px-1">
                             <label class="flex items-center justify-center flex-1 p-3 border-2 border-gray-100 bg-gray-50 rounded-2xl cursor-pointer">
                                 <input type="radio" name="order" value="sequential" class="w-4 h-4 accent-[#ff99cc]" checked>
-                                <span class="ml-2 text-sm text-gray-700 font-bold">じゅんばん</span>
+                                <span class="ml-2 text-sm text-gray-700 font-bold whitespace-nowrap">じゅんばん</span>
                             </label>
                             <label class="flex items-center justify-center flex-1 p-3 border-2 border-gray-100 bg-gray-50 rounded-2xl cursor-pointer">
                                 <input type="radio" name="order" value="random" class="w-4 h-4 accent-[#ff99cc]">
-                                <span class="ml-2 text-sm text-gray-700 font-bold">ランダム</span>
+                                <span class="ml-2 text-sm text-gray-700 font-bold whitespace-nowrap">ランダム</span>
                             </label>
                         </div>
                     </div>
@@ -458,7 +461,7 @@
     </div>
 
 <script>
-    // --- 定数 ---
+    // --- Constant ---
     const FINAL_STICKERS = [
         "🍓", "🎀", "🦄", "🍦", "🍭", "👑", "🧸", "🎨", "🌈", "🪄", 
         "🍪", "🌟", "🐱", "🐶", "🍒", "💎", "🍎", "🍑", "🍊", "🍉", 
@@ -468,7 +471,7 @@
     ];
     const SAVE_KEY = "kawaii_arithmetic_save_v2";
 
-    // --- 状態 ---
+    // --- State ---
     let userData = {
         xp: 0,
         level: 1,
@@ -489,7 +492,7 @@
 
     let elements = {};
 
-    // 画面切り替え
+    // Switch Screen
     function showScreen(screenName) {
         const screens = [elements.settingsScreen, elements.quizScreen, elements.resultsScreen, elements.recordScreen];
         screens.forEach(s => { if (s) s.classList.add('hidden'); });
@@ -504,7 +507,7 @@
         if (saved) {
             userData = JSON.parse(saved);
         } else {
-            // 初回起動特典：ガチャチケット1枚
+            // First time bonus
             userData.tickets = 1;
             saveData();
         }
@@ -774,7 +777,7 @@
     }
 
     function initialize() {
-        // 全要素の安全な取得
+        // Safe selection
         const ids = [
             'settings-screen', 'quiz-screen', 'results-screen', 'record-screen',
             'dan-select', 'dan-selector', 'dan-mode-label', 'start-button',
