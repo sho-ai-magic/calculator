@@ -167,7 +167,6 @@
         }
         .combo-anim { animation: combo-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
 
-        /* 確認モーダルのスタイル */
         .modal-overlay {
             position: absolute;
             inset: 0;
@@ -184,7 +183,7 @@
 <body>
 
     <div class="main-container" id="confetti-container">
-        <!-- Decoration -->
+        <!-- 装飾 -->
         <div class="deco-icon text-3xl top-[5%] left-[5%] floating">✨</div>
         <div class="deco-icon text-4xl top-[8%] right-[8%] floating" style="animation-delay: 1s;">💖</div>
         <div class="deco-icon text-3xl bottom-[12%] left-[8%] floating" style="animation-delay: 0.5s;">🎀</div>
@@ -192,7 +191,7 @@
 
         <div id="app" class="card">
             
-            <!-- Settings Screen -->
+            <!-- 設定画面 -->
             <div id="settings-screen" class="h-full flex flex-col p-5">
                 <div class="flex justify-between items-start mb-4 flex-shrink-0">
                     <div class="flex flex-col">
@@ -217,14 +216,11 @@
                 </div>
 
                 <div class="flex-grow overflow-y-auto scroll-hide space-y-5 pb-4 px-1">
-                    <!-- 1. 演算選択 -->
+                    <!-- 演算選択 (タイトル文字を削除) -->
                     <div class="space-y-3">
-                        <h2 class="text-lg font-bold text-gray-600 flex items-center px-1">
-                            <span class="mr-2">🍭</span> なにを お勉強する？
-                        </h2>
                         <div class="grid grid-cols-4 gap-2 px-1 py-2">
                             <label class="op-tile">
-                                <input type="radio" name="operation" value="add" class="hidden">
+                                <input type="radio" name="operation" value="add" class="hidden" checked>
                                 <div class="op-tile-inner bg-[#f0f4ff] px-1 py-3 rounded-2xl text-center">
                                     <div class="text-2xl mb-1">➕</div>
                                     <div class="text-[10px] font-bold text-gray-500 whitespace-nowrap">たしざん</div>
@@ -238,7 +234,7 @@
                                 </div>
                             </label>
                             <label class="op-tile">
-                                <input type="radio" name="operation" value="mul" class="hidden" checked>
+                                <input type="radio" name="operation" value="mul" class="hidden">
                                 <div class="op-tile-inner bg-[#f5fff0] px-1 py-3 rounded-2xl text-center">
                                     <div class="text-2xl mb-1">✖️</div>
                                     <div class="text-[10px] font-bold text-gray-500 whitespace-nowrap">かけざん</div>
@@ -260,18 +256,20 @@
                             <span class="mr-2">🧩</span> もんだいの 出しかた
                         </h2>
                         <div class="grid grid-cols-1 gap-2 px-1">
-                            <label class="flex items-center p-3 border-2 border-[#ccebff] bg-[#eef9ff] rounded-2xl cursor-pointer shadow-sm">
-                                <input type="radio" name="mode" value="all" class="w-5 h-5 accent-[#87ceeb]" checked>
-                                <span class="ml-3 text-base text-gray-700 font-bold whitespace-nowrap">ぜんぶ シャッフル！</span>
-                            </label>
+                            <!-- 「えらぶ」を上に配置し、初期選択に -->
                             <label class="block p-3 border-2 border-[#d4fcd9] bg-[#f2fff5] rounded-2xl cursor-pointer shadow-sm">
                                 <div class="flex items-center">
-                                    <input type="radio" name="mode" value="dan" class="w-5 h-5 accent-[#98fb98]">
-                                    <span class="ml-3 text-base text-gray-700 font-bold whitespace-nowrap" id="dan-mode-label">「だん」を えらぶ</span>
+                                    <input type="radio" name="mode" value="dan" class="w-5 h-5 accent-[#98fb98]" checked>
+                                    <span class="ml-3 text-base text-gray-700 font-bold whitespace-nowrap" id="dan-mode-label">「たす数」を えらぶ</span>
                                 </div>
-                                <div id="dan-selector" class="mt-2 hidden">
+                                <div id="dan-selector" class="mt-2">
                                     <select id="dan-select" class="w-full p-2 border-2 border-[#d4fcd9] rounded-xl text-base font-bold bg-white outline-none text-gray-700"></select>
                                 </div>
+                            </label>
+                            <!-- 「シャッフル」を下へ -->
+                            <label class="flex items-center p-3 border-2 border-[#ccebff] bg-[#eef9ff] rounded-2xl cursor-pointer shadow-sm">
+                                <input type="radio" name="mode" value="all" class="w-5 h-5 accent-[#87ceeb]">
+                                <span class="ml-3 text-base text-gray-700 font-bold whitespace-nowrap">ぜんぶ シャッフル！</span>
                             </label>
                         </div>
                     </div>
@@ -301,7 +299,7 @@
                 </div>
             </div>
 
-            <!-- Quiz Screen -->
+            <!-- クイズ画面 -->
             <div id="quiz-screen" class="hidden h-full flex flex-col p-5 relative">
                 <div id="combo-display" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none hidden">
                     <div class="bg-yellow-400 text-white font-black text-3xl px-6 py-2 rounded-full shadow-xl border-4 border-white combo-anim">
@@ -390,7 +388,7 @@
                     </button>
                 </div>
 
-                <!-- ガチャ確認モーダル (結果画面の上に重ねる) -->
+                <!-- Gacha Confirmation Modal -->
                 <div id="gacha-confirm-modal" class="modal-overlay hidden">
                     <div class="bg-white p-6 rounded-[2.5rem] border-4 border-orange-200 shadow-2xl w-full text-center space-y-6 pop-up">
                         <div class="text-5xl">🎫✨</div>
@@ -496,9 +494,9 @@
     // --- Constant ---
     const FINAL_STICKERS = [
         "🍓", "🎀", "🦄", "🍦", "🍭", "👑", "🧸", "🎨", "🌈", "🪄", 
-        "🍪", "🌟", "🐱", "🐶", "🍒", "💎", "🍎", "🍑", "🍊", "🍉", 
+        "🍪", "🌟", "🐱", "🐶", "🍒", "💎", "🍎", "桃", "🍊", "🍉", 
         "🍇", "🥞", "🍩", "🧁", "🍮", "🍫", "🍰", "🥨", "🍬", "🍨", 
-        " popcorn", "🥤", "🍙", "🍡", "🐼", "🎈", "🎊", "🎁", "👗", "💄", 
+        "🍿", "🥤", "🍙", "🍡", "🐼", "🎈", "🎊", "🎁", "👗", "💄", 
         "💍", "🎒", "👒", "🌸", "🌷", "🌼", "🌻", "🍀", "🦋", "🐰"
     ];
     const SAVE_KEY = "kawaii_arithmetic_save_v2";
@@ -510,7 +508,8 @@
         tickets: 0,
         stickers: [], 
         stamps: [],
-        claimedWeeklyBonus: "" 
+        claimedWeeklyBonus: "",
+        lastOperation: "add" 
     };
 
     let quizState = {
@@ -524,7 +523,6 @@
 
     let elements = {};
 
-    // Switch Screen
     function showScreen(screenName) {
         const screens = [elements.settingsScreen, elements.quizScreen, elements.resultsScreen, elements.recordScreen];
         screens.forEach(s => { if (s) s.classList.add('hidden'); });
@@ -539,32 +537,37 @@
         if (saved) {
             userData = JSON.parse(saved);
         } else {
-            // First time bonus
             userData.tickets = 1;
+            userData.lastOperation = "add";
             saveData();
         }
-        updateTopBar();
-        checkWeeklyStamps();
+        updateAllUI();
     }
 
     function saveData() {
         localStorage.setItem(SAVE_KEY, JSON.stringify(userData));
     }
 
+    function updateAllUI() {
+        updateTopBar();
+        updateRecordUI();
+        checkWeeklyStamps();
+    }
+
     function updateTopBar() {
-        if (elements.displayXP) elements.displayXP.textContent = userData.xp;
+        if (elements.displayXp) elements.displayXp.textContent = userData.xp;
         if (elements.displayLevel) elements.displayLevel.textContent = userData.level;
         if (elements.displayTickets) elements.displayTickets.textContent = userData.tickets;
-        if (elements.displayXPBar) {
+        if (elements.displayXpBar) {
             const currentXPInLevel = userData.xp % 100;
-            elements.displayXPBar.style.width = `${currentXPInLevel}%`;
+            elements.displayXpBar.style.width = `${currentXPInLevel}%`;
         }
     }
 
     function awardTicket(count = 1) {
         userData.tickets += count;
         saveData();
-        updateTopBar();
+        updateAllUI();
     }
 
     function getWeekIdentifier(date) {
@@ -610,18 +613,20 @@
         const oldLevel = userData.level;
         userData.xp += amount;
         userData.level = Math.floor(userData.xp / 100) + 1;
-        if (userData.level > oldLevel) awardTicket(userData.level - oldLevel);
-        saveData();
-        updateTopBar();
+        if (userData.level > oldLevel) {
+            awardTicket(userData.level - oldLevel);
+        } else {
+            saveData();
+            updateAllUI();
+        }
     }
 
     function pullGacha() {
         if (userData.tickets <= 0) return;
         userData.tickets--;
         saveData();
-        updateTopBar();
+        updateAllUI();
 
-        if (elements.recordTickets) elements.recordTickets.textContent = userData.tickets;
         if (elements.gachaPullBtn) elements.gachaPullBtn.disabled = true;
         if (elements.gachaAnimArea) {
             elements.gachaAnimArea.textContent = "📦";
@@ -642,6 +647,7 @@
                 if (elements.gachaResultIcon) elements.gachaResultIcon.textContent = FINAL_STICKERS[randomIndex];
                 if (elements.gachaResultText) elements.gachaResultText.textContent = isNew ? "あたらしいシール！✨" : "もってるシールだったよ🧸";
                 if (elements.gachaResultOverlay) elements.gachaResultOverlay.classList.remove('hidden');
+                updateRecordUI();
             }, 500);
         }, 1200);
     }
@@ -762,7 +768,6 @@
         const isPerfect = (correct === total);
         let xpGained = correct * 5;
         if (isPerfect) xpGained += 20;
-        addXP(xpGained);
 
         if (elements.finalScore) elements.finalScore.textContent = `${correct} / ${total}`;
         if (elements.gainedXP) elements.gainedXP.textContent = xpGained;
@@ -770,16 +775,20 @@
         if (isPerfect) {
             if (elements.perfectBadge) elements.perfectBadge.classList.remove('hidden');
             if (elements.ticketGetBox) elements.ticketGetBox.classList.remove('hidden');
-            awardTicket(1);
             triggerConfetti();
             
-            // ガチャ確認モーダルを表示
             setTimeout(() => {
                 if (elements.gachaConfirmModal) elements.gachaConfirmModal.classList.remove('hidden');
             }, 1000);
+            
+            addXP(xpGained);
+            userData.tickets += 1; 
+            saveData();
+            updateAllUI();
         } else {
             if (elements.perfectBadge) elements.perfectBadge.classList.add('hidden');
             if (elements.ticketGetBox) elements.ticketGetBox.classList.add('hidden');
+            addXP(xpGained);
         }
 
         const todayStr = new Date().toISOString().split('T')[0];
@@ -796,8 +805,8 @@
         if (elements.recordRank) {
             elements.recordRank.textContent = userData.level < 5 ? "すうじの妖精" : userData.level < 10 ? "さんすう見習い" : userData.level < 20 ? "計算のプリンセス" : "マスター ✨";
         }
-        if (elements.recordXPBar) elements.recordXPBar.style.width = `${userData.xp % 100}%`;
-        if (elements.nextLevelXP) elements.nextLevelXP.textContent = 100 - (userData.xp % 100);
+        if (elements.recordXpBar) elements.recordXpBar.style.width = `${userData.xp % 100}%`;
+        if (elements.nextLevelXp) elements.nextLevelXp.textContent = 100 - (userData.xp % 100);
         if (elements.recordTickets) elements.recordTickets.textContent = userData.tickets;
         if (elements.gachaPullBtn) elements.gachaPullBtn.disabled = (userData.tickets <= 0);
         
@@ -810,11 +819,9 @@
                 elements.stickerGrid.appendChild(slot);
             });
         }
-        checkWeeklyStamps();
     }
 
     function initialize() {
-        // Safe selection
         const ids = [
             'settings-screen', 'quiz-screen', 'results-screen', 'record-screen',
             'dan-select', 'dan-selector', 'dan-mode-label', 'start-button',
@@ -843,6 +850,15 @@
         
         loadData();
 
+        if (userData.lastOperation) {
+            const radio = document.querySelector(`input[name="operation"][value="${userData.lastOperation}"]`);
+            if (radio) {
+                radio.checked = true;
+                const labels = {'add': 'たす数', 'sub': 'ひく数', 'mul': 'だん', 'div': 'わり数'};
+                if (elements.danModeLabel) elements.danModeLabel.textContent = `「${labels[userData.lastOperation]}」を えらぶ`;
+            }
+        }
+
         if (elements.startButton) {
             elements.startButton.addEventListener('click', () => {
                 generateProblems();
@@ -857,7 +873,10 @@
 
         document.getElementsByName('operation').forEach(r => r.addEventListener('change', () => {
             const labels = {'add': 'たす数', 'sub': 'ひく数', 'mul': 'だん', 'div': 'わり数'};
-            if (elements.danModeLabel) elements.danModeLabel.textContent = `「${labels[r.value]}」を えらぶ`;
+            const op = r.value;
+            userData.lastOperation = op;
+            saveData();
+            if (elements.danModeLabel) elements.danModeLabel.textContent = `「${labels[op]}」を えらぶ`;
         }));
 
         if (elements.nextButton) elements.nextButton.addEventListener('click', nextProblem);
@@ -866,7 +885,7 @@
         
         if (elements.openRecordBtn) {
             elements.openRecordBtn.addEventListener('click', () => { 
-                updateRecordUI(); 
+                updateAllUI(); 
                 showScreen('record'); 
             });
         }
@@ -879,16 +898,14 @@
                 if (elements.gachaResultOverlay) elements.gachaResultOverlay.classList.add('hidden');
                 if (elements.gachaAnimArea) elements.gachaAnimArea.textContent = "🔮";
                 if (elements.gachaStatus) elements.gachaStatus.textContent = "チケット1まいで 1回ひけるよ！";
-                updateRecordUI();
-                updateTopBar();
+                updateAllUI();
             });
         }
 
-        // ガチャ確認モーダルのボタンイベント
         if (elements.confirmGachaYes) {
             elements.confirmGachaYes.addEventListener('click', () => {
                 if (elements.gachaConfirmModal) elements.gachaConfirmModal.classList.add('hidden');
-                updateRecordUI();
+                updateAllUI();
                 showScreen('record');
             });
         }
