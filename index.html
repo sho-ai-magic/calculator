@@ -2,8 +2,8 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>九九れんしゅう</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>九九れんしゅう（Kawaiiスマホ完結版）</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -18,22 +18,21 @@
         body {
             margin: 0;
             overflow: hidden;
-            touch-action: none; /* ダブルタップズーム防止 */
+            touch-action: pan-y; /* スクロールは許可 */
+            background: linear-gradient(135deg, #fff5f7 0%, #f0f4ff 50%, #f5fff0 100%);
         }
 
         .main-container {
             height: 100vh;
-            height: -webkit-fill-available;
+            height: 100dvh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #fff5f7 0%, #f0f4ff 50%, #f5fff0 100%);
             position: relative;
-            overflow: hidden;
-            padding: 0.5rem;
+            padding: 12px;
         }
 
-        /* 背景の装飾用アイコン */
+        /* 背景の装飾 */
         .deco-icon {
             position: absolute;
             z-index: 0;
@@ -45,219 +44,207 @@
         .card {
             position: relative;
             z-index: 10;
-            box-shadow: 0 10px 25px rgba(255, 182, 193, 0.2);
             background-color: rgba(255, 255, 255, 0.95);
-            border: 3px solid #ffffff;
-            border-radius: 1.5rem;
+            border: 4px solid #ffffff;
+            border-radius: 2rem;
             width: 100%;
-            max-width: 400px;
-            max-height: 95vh;
+            max-width: 420px;
+            height: 100%;
+            max-height: 90vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(255, 182, 193, 0.25);
+            overflow: hidden; /* カード自体ははみ出さない */
         }
 
-        /* パステルカラー定義 */
-        .kawaii-pink-bg { background-color: #ffeff2; }
-        .kawaii-pink-border { border-color: #ffcce0; }
-        .kawaii-pink-text { color: #ff85b3; }
-        .kawaii-pink-btn { 
-            background-color: #ff99cc; 
-            border-bottom: 4px solid #ff66a3;
+        /* ボタンデザイン */
+        .btn-base {
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-bottom: 5px solid rgba(0,0,0,0.15);
             color: white;
-        }
-        .kawaii-pink-btn:active {
-            border-bottom-width: 0;
-            transform: translateY(4px);
-        }
-
-        .kawaii-blue-bg { background-color: #eef9ff; }
-        .kawaii-blue-border { border-color: #ccebff; }
-        .kawaii-blue-text { color: #70c1ff; }
-        .kawaii-blue-btn { 
-            background-color: #87ceeb;
-            border-bottom: 4px solid #5fbadd;
-            color: white;
-        }
-        .kawaii-blue-btn:active {
-            border-bottom-width: 0;
-            transform: translateY(4px);
-        }
-
-        .kawaii-green-bg { background-color: #f2fff5; }
-        .kawaii-green-border { border-color: #d4fcd9; }
-        .kawaii-green-text { color: #7ad18a; }
-        .kawaii-green-btn { 
-            background-color: #98fb98;
-            border-bottom: 4px solid #6edb6e;
-            color: white;
-        }
-        .kawaii-green-btn:active {
-            border-bottom-width: 0;
-            transform: translateY(4px);
-        }
-
-        /* テンキーボタンのデザイン */
-        .keypad-btn {
-            font-size: 1.25rem;
             font-weight: 800;
-            height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 1rem;
-            transition: all 0.1s;
-            user-select: none;
-            touch-action: manipulation;
-            border-bottom: 3px solid rgba(0,0,0,0.1);
+        }
+        .btn-base:active {
+            transform: translateY(3px);
+            border-bottom-width: 0;
+        }
+
+        .kawaii-pink { background-color: #ff99cc; border-bottom-color: #ff66a3; }
+        .kawaii-blue { background-color: #87ceeb; border-bottom-color: #5fbadd; }
+        .kawaii-green { background-color: #98fb98; border-bottom-color: #6edb6e; }
+        .kawaii-purple { background-color: #ccb3ff; border-bottom-color: #a680ff; }
+
+        .keypad-btn {
+            font-size: 1.5rem;
+            border-radius: 1.25rem;
+            background-color: #eef9ff;
+            color: #70c1ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            min-height: 50px;
+            border-bottom: 4px solid #ccebff;
         }
         .keypad-btn:active {
             transform: translateY(2px);
-            border-bottom-width: 1px;
+            border-bottom-width: 0;
         }
 
-        /* アニメーション */
         @keyframes float {
-            0% { transform: translateY(0px); }
+            0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-8px); }
-            100% { transform: translateY(0px); }
         }
-        .floating {
-            animation: float 3s ease-in-out infinite;
-        }
+        .floating { animation: float 3s ease-in-out infinite; }
+
+        /* スクロールバーのデザインを隠す */
+        .scroll-hide::-webkit-scrollbar { display: none; }
+        .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="main-container">
+<body>
 
-    <!-- 背景の装飾デコ -->
-    <div class="deco-icon text-3xl top-5 left-5 floating" style="animation-delay: 0s;">✨</div>
-    <div class="deco-icon text-4xl top-10 right-5 floating" style="animation-delay: 1s;">💖</div>
-    <div class="deco-icon text-3xl bottom-10 left-5 floating" style="animation-delay: 0.5s;">🎀</div>
-    <div class="deco-icon text-4xl bottom-5 right-10 floating" style="animation-delay: 1.5s;">🌟</div>
+    <div class="main-container">
+        <!-- 装飾 -->
+        <div class="deco-icon text-3xl top-[5%] left-[5%] floating">✨</div>
+        <div class="deco-icon text-4xl top-[8%] right-[8%] floating" style="animation-delay: 1s;">💖</div>
+        <div class="deco-icon text-3xl bottom-[12%] left-[8%] floating" style="animation-delay: 0.5s;">🎀</div>
+        <div class="deco-icon text-4xl bottom-[5%] right-[5%] floating" style="animation-delay: 1.5s;">🌟</div>
 
-    <div id="app" class="w-full max-w-sm">
-        
-        <!-- 設定画面 -->
-        <div id="settings-screen" class="card p-5 space-y-4">
-            <div class="text-center">
-                <span class="text-pink-400 text-3xl">🎀</span>
-                <h1 class="text-2xl font-extrabold text-gray-700">九九れんしゅう</h1>
-            </div>
-
-            <div class="space-y-3">
-                <h2 class="text-base font-bold text-gray-600 flex items-center">
-                    <span class="mr-2">🍭</span> どっちで あそぶ？
-                </h2>
-                <div class="space-y-2">
-                    <label class="flex items-center p-3 border-2 rounded-xl cursor-pointer kawaii-blue-border kawaii-blue-bg shadow-sm">
-                        <input type="radio" name="mode" value="all" id="mode-all" class="w-4 h-4 accent-blue-400" checked>
-                        <span class="ml-2 text-sm text-gray-700 font-bold">ぜんぶを シャッフル！</span>
-                    </label>
-                    
-                    <label class="block p-3 border-2 rounded-xl cursor-pointer kawaii-green-border kawaii-green-bg shadow-sm">
-                        <div class="flex items-center">
-                            <input type="radio" name="mode" value="dan" id="mode-dan" class="w-4 h-4 accent-green-400">
-                            <span class="ml-2 text-sm text-gray-700 font-bold">すきな「だん」を えらぶ</span>
-                        </div>
-                        <div id="dan-selector" class="mt-2 ml-6 hidden">
-                            <select id="dan-select" class="w-full p-2 border-2 kawaii-green-border rounded-lg text-sm font-bold bg-white outline-none">
-                                <!-- JSで生成 -->
-                            </select>
-                        </div>
-                    </label>
-                </div>
-            </div>
-
-            <div class="space-y-3 pt-3 border-t border-pink-100">
-                <h2 class="text-base font-bold text-gray-600 flex items-center">
-                    <span class="mr-2">🎨</span> じゅんばん
-                </h2>
-                <div class="flex space-x-2">
-                    <label class="flex items-center justify-center flex-1 p-2 border-2 rounded-xl cursor-pointer border-gray-200 bg-gray-50">
-                        <input type="radio" name="order" value="sequential" class="accent-pink-400" checked>
-                        <span class="ml-1 text-xs text-gray-700 font-bold">じゅんばん</span>
-                    </label>
-                    <label class="flex items-center justify-center flex-1 p-2 border-2 rounded-xl cursor-pointer border-gray-200 bg-gray-50">
-                        <input type="radio" name="order" value="random" class="accent-pink-400">
-                        <span class="ml-1 text-xs text-gray-700 font-bold">ランダム</span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="flex-grow"></div>
-            <button id="start-button" class="w-full py-4 kawaii-pink-btn text-white font-extrabold text-xl rounded-2xl shadow-md">
-                スタート！ ✨
-            </button>
-        </div>
-
-        <!-- クイズ画面 -->
-        <div id="quiz-screen" class="card p-4 hidden space-y-3">
-            <div class="flex justify-between items-center px-1">
-                <span class="text-pink-300">💖</span>
-                <p id="progress-text" class="text-xs kawaii-blue-text font-bold"></p>
-                <span class="text-pink-300">💖</span>
-            </div>
+        <div id="app" class="card">
             
-            <!-- 問題表示 -->
-            <div class="flex flex-col items-center justify-center py-4 px-2 kawaii-blue-bg rounded-2xl border-2 kawaii-blue-border h-24 shadow-inner relative">
-                <p id="problem-text" class="text-4xl font-black text-gray-800 tracking-tighter">5 × 8 = ?</p>
-            </div>
-
-            <!-- 入力欄 -->
-            <div class="relative">
-                <input type="text" id="answer-input" placeholder="？" readonly
-                       class="w-full text-center text-4xl p-2 border-4 border-pink-100 rounded-xl bg-white text-pink-400 font-black focus:outline-none">
-            </div>
-
-            <!-- 操作エリア -->
-            <div class="flex-grow flex flex-col justify-center">
-                <div id="keypad" class="grid grid-cols-3 gap-2">
-                    <button class="keypad-btn kawaii-blue-bg text-blue-500" data-val="1">1</button>
-                    <button class="keypad-btn kawaii-blue-bg text-blue-500" data-val="2">2</button>
-                    <button class="keypad-btn kawaii-blue-bg text-blue-500" data-val="3">3</button>
-                    <button class="keypad-btn kawaii-blue-bg text-blue-500" data-val="4">4</button>
-                    <button class="keypad-btn kawaii-blue-bg text-blue-500" data-val="5">5</button>
-                    <button class="keypad-btn kawaii-blue-bg text-blue-500" data-val="6">6</button>
-                    <button class="keypad-btn kawaii-blue-bg text-blue-500" data-val="7">7</button>
-                    <button class="keypad-btn kawaii-blue-bg text-blue-500" data-val="8">8</button>
-                    <button class="keypad-btn kawaii-blue-bg text-blue-500" data-val="9">9</button>
-                    <button class="keypad-btn kawaii-pink-bg text-pink-500 text-base" data-val="C">消す</button>
-                    <button class="keypad-btn kawaii-blue-bg text-blue-500" data-val="0">0</button>
-                    <button id="check-button" class="keypad-btn kawaii-green-btn text-white text-lg" data-val="Enter">OK</button>
+            <!-- 設定画面 -->
+            <div id="settings-screen" class="h-full flex flex-col p-5">
+                <!-- タイトルエリア -->
+                <div class="text-center mb-4 flex-shrink-0">
+                    <span class="text-4xl">🎀</span>
+                    <h1 class="text-2xl font-extrabold text-gray-700 mt-1">九九れんしゅう</h1>
                 </div>
 
-                <div id="next-button-container" class="hidden py-2">
-                    <button id="next-button" class="w-full py-10 kawaii-pink-btn text-white font-black text-3xl rounded-2xl shadow-md">
-                        つぎへ ➔
+                <!-- スクロール可能なコンテンツエリア -->
+                <div class="flex-grow overflow-y-auto scroll-hide space-y-6 pb-4">
+                    <div class="space-y-3">
+                        <h2 class="text-lg font-bold text-gray-600 flex items-center">
+                            <span class="mr-2">🍭</span> モードを えらんでね
+                        </h2>
+                        <div class="grid grid-cols-1 gap-2">
+                            <label class="flex items-center p-3 border-2 border-[#ccebff] bg-[#eef9ff] rounded-2xl cursor-pointer shadow-sm">
+                                <input type="radio" name="mode" value="all" class="w-5 h-5 accent-[#87ceeb]" checked>
+                                <span class="ml-3 text-base text-gray-700 font-bold">ぜんぶ シャッフル！</span>
+                            </label>
+                            
+                            <label class="block p-3 border-2 border-[#d4fcd9] bg-[#f2fff5] rounded-2xl cursor-pointer shadow-sm">
+                                <div class="flex items-center">
+                                    <input type="radio" name="mode" value="dan" class="w-5 h-5 accent-[#98fb98]">
+                                    <span class="ml-3 text-base text-gray-700 font-bold">「だん」を えらぶ</span>
+                                </div>
+                                <div id="dan-selector" class="mt-2 hidden">
+                                    <select id="dan-select" class="w-full p-2 border-2 border-[#d4fcd9] rounded-xl text-base font-bold bg-white outline-none text-gray-700">
+                                        <!-- JS -->
+                                    </select>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <h2 class="text-lg font-bold text-gray-600 flex items-center">
+                            <span class="mr-2">🎨</span> じゅんばん
+                        </h2>
+                        <div class="flex space-x-2">
+                            <label class="flex items-center justify-center flex-1 p-3 border-2 border-gray-100 bg-gray-50 rounded-2xl cursor-pointer">
+                                <input type="radio" name="order" value="sequential" class="w-4 h-4 accent-[#ff99cc]" checked>
+                                <span class="ml-2 text-sm text-gray-700 font-bold">じゅんばん</span>
+                            </label>
+                            <label class="flex items-center justify-center flex-1 p-3 border-2 border-gray-100 bg-gray-50 rounded-2xl cursor-pointer">
+                                <input type="radio" name="order" value="random" class="w-4 h-4 accent-[#ff99cc]">
+                                <span class="ml-2 text-sm text-gray-700 font-bold">ランダム</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- スタートボタン (固定位置) -->
+                <div class="flex-shrink-0 pt-2 border-t border-pink-50">
+                    <button id="start-button" class="w-full py-4 btn-base kawaii-pink text-xl rounded-2xl shadow-lg">
+                        スタート！ ✨
                     </button>
                 </div>
             </div>
 
-            <!-- フィードバック -->
-            <div id="feedback-message" class="text-center text-xl font-black h-8 flex items-center justify-center"></div>
-            
-            <button id="reset-quiz-button" class="w-full text-center text-[10px] text-gray-400 hover:text-pink-400 font-bold">
-                設定に戻る 🧸
-            </button>
-        </div>
+            <!-- クイズ画面 -->
+            <div id="quiz-screen" class="hidden h-full flex flex-col p-5">
+                <div class="flex justify-between items-center mb-2 flex-shrink-0">
+                    <span class="text-pink-300 text-xl">💖</span>
+                    <p id="progress-text" class="text-base text-[#70c1ff] font-bold"></p>
+                    <span class="text-pink-300 text-xl">💖</span>
+                </div>
+                
+                <!-- 問題表示 -->
+                <div class="flex-grow flex flex-col justify-center items-center py-2">
+                    <div class="w-full h-32 flex items-center justify-center bg-[#eef9ff] rounded-[2rem] border-4 border-[#ccebff] shadow-inner relative overflow-hidden">
+                        <div class="absolute top-0 left-0 p-2 opacity-10 text-3xl">✨</div>
+                        <p id="problem-text" class="text-5xl font-black text-gray-800 tracking-tighter">5 × 8</p>
+                    </div>
+                </div>
 
-        <!-- 結果画面 -->
-        <div id="results-screen" class="card p-6 hidden flex flex-col justify-center items-center space-y-6">
-            <div class="text-center">
-                <p class="text-5xl mb-2">👑</p>
-                <h1 class="text-3xl font-black kawaii-pink-text">おめでとう！</h1>
-            </div>
-            
-            <div class="text-center bg-white border-4 border-dashed kawaii-green-border p-6 rounded-full shadow-lg aspect-square flex flex-col justify-center items-center w-40">
-                <p class="text-xs text-gray-500 font-bold">スコア</p>
-                <p id="final-score" class="text-4xl font-black kawaii-green-text">0 / 0</p>
-            </div>
-            
-            <button id="review-button" class="w-full py-4 kawaii-pink-btn text-white font-extrabold text-xl rounded-2xl shadow-md mt-4">
-                もういっかい！ 🎀
-            </button>
-        </div>
+                <!-- 回答入力エリア -->
+                <div class="my-3 flex-shrink-0">
+                    <div class="bg-white border-4 border-[#ffeff2] rounded-2xl py-3 text-center shadow-sm">
+                        <span id="answer-display" class="text-5xl font-black text-[#ff85b3]">？</span>
+                    </div>
+                </div>
 
+                <!-- テンキーエリア -->
+                <div class="h-[45%] flex-shrink-0">
+                    <div id="keypad" class="grid grid-cols-3 gap-2 h-full">
+                        <button class="keypad-btn" data-val="1">1</button>
+                        <button class="keypad-btn" data-val="2">2</button>
+                        <button class="keypad-btn" data-val="3">3</button>
+                        <button class="keypad-btn" data-val="4">4</button>
+                        <button class="keypad-btn" data-val="5">5</button>
+                        <button class="keypad-btn" data-val="6">6</button>
+                        <button class="keypad-btn" data-val="7">7</button>
+                        <button class="keypad-btn" data-val="8">8</button>
+                        <button class="keypad-btn" data-val="9">9</button>
+                        <button class="keypad-btn !bg-[#ffeff2] !text-[#ff85b3] !border-[#ffcce0] text-sm font-bold" data-val="C">けす</button>
+                        <button class="keypad-btn" data-val="0">0</button>
+                        <button id="check-button" class="keypad-btn !bg-[#98fb98] !text-white !border-[#6edb6e] text-lg" data-val="Enter">OK</button>
+                    </div>
+
+                    <div id="next-button-container" class="hidden h-full">
+                        <button id="next-button" class="w-full h-full btn-base kawaii-blue text-3xl rounded-3xl shadow-lg">
+                            つぎへ ➔
+                        </button>
+                    </div>
+                </div>
+
+                <div class="text-center pt-2 flex-shrink-0">
+                    <button id="reset-quiz-button" class="text-[10px] text-gray-300 font-bold">設定にもどる</button>
+                </div>
+            </div>
+
+            <!-- 結果画面 -->
+            <div id="results-screen" class="hidden h-full flex flex-col justify-between items-center py-8 px-5">
+                <div class="text-center">
+                    <p class="text-6xl mb-2 floating">👑</p>
+                    <h1 class="text-3xl font-black text-[#ff85b3]">おめでとう！</h1>
+                </div>
+                
+                <div class="w-48 h-48 bg-white border-8 border-dashed border-[#d4fcd9] rounded-full shadow-xl flex flex-col justify-center items-center">
+                    <p class="text-sm text-gray-500 font-bold">スコア</p>
+                    <p id="final-score" class="text-4xl font-black text-[#7ad18a] mt-1">0 / 0</p>
+                </div>
+                
+                <button id="review-button" class="w-full py-4 btn-base kawaii-purple text-xl rounded-2xl shadow-xl">
+                    もういっかい！ 🎀
+                </button>
+            </div>
+
+        </div>
     </div>
 
 <script>
@@ -267,20 +254,19 @@
         resultsScreen: document.getElementById('results-screen'),
         danSelect: document.getElementById('dan-select'),
         danSelector: document.getElementById('dan-selector'),
-        modeAll: document.getElementById('mode-all'),
-        modeDan: document.getElementById('mode-dan'),
         startButton: document.getElementById('start-button'),
         problemText: document.getElementById('problem-text'),
-        answerInput: document.getElementById('answer-input'),
+        answerDisplay: document.getElementById('answer-display'),
         checkButton: document.getElementById('check-button'),
         nextButton: document.getElementById('next-button'),
         nextButtonContainer: document.getElementById('next-button-container'),
-        feedbackMessage: document.getElementById('feedback-message'),
         progressText: document.getElementById('progress-text'),
         finalScore: document.getElementById('final-score'),
         reviewButton: document.getElementById('review-button'),
         resetQuizButton: document.getElementById('reset-quiz-button'),
-        keypad: document.getElementById('keypad')
+        keypad: document.getElementById('keypad'),
+        modeOptions: document.getElementsByName('mode'),
+        orderOptions: document.getElementsByName('order')
     };
 
     let quizState = {
@@ -288,6 +274,7 @@
         currentIndex: 0,
         correctCount: 0,
         isAwaitingNext: false,
+        currentInput: "",
         settings: { mode: 'all', dan: 1, order: 'sequential' }
     };
 
@@ -317,11 +304,15 @@
     }
 
     function toggleDanSelector() {
-        elements.danSelector.classList.toggle('hidden', !elements.modeDan.checked);
+        const isDanMode = Array.from(elements.modeOptions).find(r => r.checked).value === 'dan';
+        elements.danSelector.classList.toggle('hidden', !isDanMode);
     }
 
     function generateProblems() {
-        const { mode, dan, order } = quizState.settings;
+        const mode = Array.from(elements.modeOptions).find(r => r.checked).value;
+        const order = Array.from(elements.orderOptions).find(r => r.checked).value;
+        const dan = parseInt(elements.danSelect.value, 10);
+        
         let p = [];
         if (mode === 'dan') {
             for (let j = 1; j <= 9; j++) p.push({ num1: dan, num2: j, answer: dan * j });
@@ -329,9 +320,9 @@
             p = [...allMultiplication];
         }
         if (order === 'random') p = shuffleArray(p);
+        
         quizState.problems = p;
         quizState.currentIndex = 0;
-        quizCount = p.length;
         quizState.correctCount = 0;
     }
 
@@ -339,8 +330,9 @@
         const problem = quizState.problems[quizState.currentIndex];
         if (!problem) return;
 
-        elements.answerInput.value = '';
-        elements.feedbackMessage.textContent = '';
+        quizState.currentInput = "";
+        elements.answerDisplay.textContent = "？";
+        elements.answerDisplay.style.color = "#ff85b3";
         elements.keypad.classList.remove('hidden');
         elements.nextButtonContainer.classList.add('hidden');
         
@@ -349,22 +341,21 @@
     }
 
     function checkAnswer() {
-        if (quizState.isAwaitingNext) return;
+        if (quizState.isAwaitingNext || quizState.currentInput === "") return;
+        
         const problem = quizState.problems[quizState.currentIndex];
-        const userAnswer = parseInt(elements.answerInput.value, 10);
-
-        if (isNaN(userAnswer)) return;
+        const userAnswer = parseInt(quizState.currentInput, 10);
 
         elements.keypad.classList.add('hidden');
         elements.nextButtonContainer.classList.remove('hidden');
 
         if (userAnswer === problem.answer) {
             quizState.correctCount++;
-            elements.feedbackMessage.textContent = '✨ 正解！💮';
-            elements.feedbackMessage.className = 'text-center text-2xl font-black h-8 text-green-500';
+            elements.answerDisplay.textContent = "○ せいかい！";
+            elements.answerDisplay.style.color = "#7ad18a";
         } else {
-            elements.feedbackMessage.textContent = `答えは ${problem.answer} 💦`;
-            elements.feedbackMessage.className = 'text-center text-xl font-black h-8 text-pink-500';
+            elements.answerDisplay.textContent = `× こたえ:${problem.answer}`;
+            elements.answerDisplay.style.color = "#ff85b3";
         }
         quizState.isAwaitingNext = true;
     }
@@ -382,13 +373,16 @@
 
     function handleKeypadPress(val) {
         if (quizState.isAwaitingNext) return;
+        
         if (val === 'C') {
-            elements.answerInput.value = '';
+            quizState.currentInput = "";
+            elements.answerDisplay.textContent = "？";
         } else if (val === 'Enter') {
-            if (elements.answerInput.value !== '') checkAnswer();
+            if (quizState.currentInput !== "") checkAnswer();
         } else {
-            if (elements.answerInput.value.length < 2) {
-                elements.answerInput.value += val;
+            if (quizState.currentInput.length < 2) {
+                quizState.currentInput += val;
+                elements.answerDisplay.textContent = quizState.currentInput;
             }
         }
     }
@@ -401,16 +395,12 @@
         }
 
         elements.startButton.addEventListener('click', () => {
-            quizState.settings.mode = document.querySelector('input[name="mode"]:checked').value;
-            quizState.settings.order = document.querySelector('input[name="order"]:checked').value;
-            quizState.settings.dan = parseInt(elements.danSelect.value, 10);
             generateProblems();
             showScreen('quiz');
             displayCurrentProblem();
         });
 
-        elements.modeAll.addEventListener('change', toggleDanSelector);
-        elements.modeDan.addEventListener('change', toggleDanSelector);
+        Array.from(elements.modeOptions).forEach(r => r.addEventListener('change', toggleDanSelector));
         elements.nextButton.addEventListener('click', nextProblem);
         elements.reviewButton.addEventListener('click', () => showScreen('settings'));
         elements.resetQuizButton.addEventListener('click', () => showScreen('settings'));
