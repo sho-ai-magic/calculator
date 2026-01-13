@@ -123,13 +123,14 @@
             aspect-ratio: 1;
             background: #fff;
             border: 2px dashed #ffcce0;
-            border-radius: 1rem;
+            border-radius: 0.75rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.25rem;
+            position: relative;
         }
-        .sticker-slot.empty { opacity: 0.3; font-size: 1rem; color: #ffcce0; }
+        .sticker-slot.empty { opacity: 0.2; font-size: 0.75rem; color: #ffcce0; }
 
         .confetti {
             position: absolute;
@@ -157,9 +158,6 @@
             z-index: 20;
             box-shadow: 0 0 15px rgba(255, 153, 204, 0.3);
         }
-        .op-tile input:checked + .op-tile-inner .text-gray-500 {
-            color: #ff85b3;
-        }
 
         @keyframes combo-pop {
             0% { transform: scale(0.5) rotate(-5deg); opacity: 0; }
@@ -180,7 +178,6 @@
             padding: 1.5rem;
         }
 
-        /* レベルアップアニメーション */
         @keyframes rainbow-border {
             0% { border-color: #ff99cc; }
             33% { border-color: #87ceeb; }
@@ -196,7 +193,7 @@
 <body>
 
     <div class="main-container" id="confetti-container">
-        <!-- 装飾アイコン -->
+        <!-- Decoration Icons -->
         <div class="deco-icon text-3xl top-[5%] left-[5%] floating">✨</div>
         <div class="deco-icon text-4xl top-[10%] right-[8%] floating" style="animation-delay: 1s;">💖</div>
         <div class="deco-icon text-3xl bottom-[12%] left-[8%] floating" style="animation-delay: 0.5s;">🎀</div>
@@ -205,8 +202,8 @@
         <div id="app" class="card">
             
             <!-- 設定画面 -->
-            <div id="settings-screen" class="h-full flex flex-col p-5 relative">
-                <div class="flex justify-between items-start mb-4 flex-shrink-0">
+            <div id="settings-screen" class="h-full flex flex-col p-5 relative text-center">
+                <div class="flex justify-between items-start mb-4 flex-shrink-0 text-left">
                     <div class="flex flex-col">
                         <div class="flex items-center space-x-2">
                             <span class="bg-pink-400 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">Lv. <span id="display-level">1</span></span>
@@ -217,6 +214,7 @@
                         <div class="flex items-center mt-1 space-x-2">
                             <span class="text-[10px] text-pink-300 font-bold">XP: <span id="display-xp">0</span></span>
                             <span class="text-[10px] text-orange-400 font-bold">🎫: <span id="display-tickets">0</span></span>
+                            <span id="lap-display-top" class="text-[10px] text-blue-400 font-bold hidden">🏁: <span id="display-lap">1</span>しゅうめ</span>
                         </div>
                     </div>
                     <button id="open-record-btn" class="text-xs bg-white border-2 border-pink-200 text-pink-400 font-bold px-3 py-1 rounded-full shadow-sm active:scale-95 transition">
@@ -224,38 +222,38 @@
                     </button>
                 </div>
 
-                <div class="text-center mb-4 flex-shrink-0">
+                <div class="mb-4 flex-shrink-0">
                     <h1 class="text-2xl font-extrabold text-gray-700">さんすうれんしゅう</h1>
                 </div>
 
                 <div class="flex-grow overflow-y-auto scroll-hide space-y-5 pb-4 px-1">
-                    <!-- 演算選択 -->
+                    <!-- 1. 演算選択 -->
                     <div class="space-y-3">
                         <div class="grid grid-cols-4 gap-2 px-1 py-2">
                             <label class="op-tile">
                                 <input type="radio" name="operation" value="add" class="hidden" checked>
-                                <div class="op-tile-inner bg-[#f0f4ff] px-1 py-3 rounded-2xl text-center">
+                                <div class="op-tile-inner bg-[#f0f4ff] px-1 py-3 rounded-2xl">
                                     <div class="text-2xl mb-1">➕</div>
                                     <div class="text-[10px] font-bold text-gray-500 whitespace-nowrap">たしざん</div>
                                 </div>
                             </label>
                             <label class="op-tile">
                                 <input type="radio" name="operation" value="sub" class="hidden">
-                                <div class="op-tile-inner bg-[#fff5f7] px-1 py-3 rounded-2xl text-center">
+                                <div class="op-tile-inner bg-[#fff5f7] px-1 py-3 rounded-2xl">
                                     <div class="text-2xl mb-1">➖</div>
                                     <div class="text-[10px] font-bold text-gray-500 whitespace-nowrap">ひきざん</div>
                                 </div>
                             </label>
                             <label class="op-tile">
                                 <input type="radio" name="operation" value="mul" class="hidden">
-                                <div class="op-tile-inner bg-[#f5fff0] px-1 py-3 rounded-2xl text-center">
+                                <div class="op-tile-inner bg-[#f5fff0] px-1 py-3 rounded-2xl">
                                     <div class="text-2xl mb-1">✖️</div>
                                     <div class="text-[10px] font-bold text-gray-500 whitespace-nowrap">かけざん</div>
                                 </div>
                             </label>
                             <label class="op-tile">
                                 <input type="radio" name="operation" value="div" class="hidden">
-                                <div class="op-tile-inner bg-[#fdfcf0] px-1 py-3 rounded-2xl text-center">
+                                <div class="op-tile-inner bg-[#fdfcf0] px-1 py-3 rounded-2xl">
                                     <div class="text-2xl mb-1">➗</div>
                                     <div class="text-[10px] font-bold text-gray-500 whitespace-nowrap">わりざん</div>
                                 </div>
@@ -263,8 +261,8 @@
                         </div>
                     </div>
 
-                    <!-- モード選択 -->
-                    <div class="space-y-3">
+                    <!-- 2. モード選択 -->
+                    <div class="space-y-3 text-left">
                         <h2 class="text-lg font-bold text-gray-600 flex items-center px-1">
                             <span class="mr-2">🧩</span> もんだいの 出しかた
                         </h2>
@@ -285,8 +283,8 @@
                         </div>
                     </div>
 
-                    <!-- 順序選択 -->
-                    <div class="space-y-3">
+                    <!-- 3. 順序選択 -->
+                    <div class="space-y-3 text-left">
                         <h2 class="text-lg font-bold text-gray-600 flex items-center px-1">
                             <span class="mr-2">🎨</span> じゅんばん
                         </h2>
@@ -313,19 +311,14 @@
                 <div id="tutorial-modal" class="modal-overlay hidden">
                     <div class="bg-white p-6 rounded-[2.5rem] border-4 border-pink-200 shadow-2xl w-full text-center space-y-4 pop-up max-h-[85vh] overflow-y-auto scroll-hide">
                         <div class="text-5xl">🍭ガイド✨</div>
-                        <div>
-                            <h2 class="text-2xl font-black text-pink-500">あそびかた</h2>
-                        </div>
+                        <h2 class="text-2xl font-black text-pink-500">あそびかた</h2>
                         <ul class="text-left space-y-3 text-sm font-bold text-gray-600">
                             <li class="flex items-start"><span class="mr-2">✏️</span>もんだいに答えてXP(経験値)をためよう！</li>
                             <li class="flex items-start"><span class="mr-2">🎫</span>100XPためるか、ぜんぶ正解するとガチャチケットがもらえるよ！</li>
-                            <li class="flex items-start text-orange-500"><span class="mr-2">🎁</span>はじめにチケットを「1まい」プレゼントしたよ！</li>
-                            <li class="flex items-start"><span class="mr-2">🎰</span>「がんばり記録」ボタンからガチャをまわせるよ！</li>
-                            <li class="flex items-start text-pink-400"><span class="mr-2">🍓</span>シールはぜんぶで50種類！コンプリートを目指してね！</li>
+                            <li class="flex items-start text-orange-500"><span class="mr-2">🎁</span>はじめにチケットを「1まい」プレゼント！</li>
+                            <li class="flex items-start"><span class="mr-2">🎰</span>シールを集めて「ビンゴ」になるとさらにチケットゲット！</li>
                         </ul>
-                        <button id="close-tutorial-btn" class="w-full py-4 btn-base kawaii-blue text-xl rounded-2xl shadow-md">
-                            わかった！ 🎀
-                        </button>
+                        <button id="close-tutorial-btn" class="w-full py-4 btn-base kawaii-blue text-xl rounded-2xl shadow-md">わかった！ 🎀</button>
                     </div>
                 </div>
             </div>
@@ -337,7 +330,6 @@
                         <span id="combo-count">2</span> コンボ！
                     </div>
                 </div>
-
                 <div class="flex justify-between items-center mb-3 flex-shrink-0">
                     <span class="text-pink-300 text-2xl">💖</span>
                     <div class="bg-[#eef9ff] px-4 py-1 rounded-full border-2 border-[#ccebff]">
@@ -345,20 +337,17 @@
                     </div>
                     <span class="text-pink-300 text-2xl">💖</span>
                 </div>
-                
-                <div class="flex-grow flex flex-col justify-center items-center py-1">
+                <div class="flex-grow flex flex-col justify-center items-center py-1 text-center">
                     <div class="w-full h-32 flex items-center justify-center bg-[#eef9ff] rounded-[2rem] border-4 border-[#ccebff] shadow-inner relative overflow-hidden">
                         <div class="absolute top-0 left-0 p-2 opacity-10 text-3xl">✨</div>
-                        <p id="problem-text" class="text-5xl font-black text-gray-800 tracking-tighter">5 × 8</p>
+                        <p id="problem-text" class="text-5xl font-black text-gray-800 tracking-tighter"></p>
                     </div>
                 </div>
-
                 <div class="my-3 flex-shrink-0">
                     <div class="bg-white border-4 border-[#ffeff2] rounded-2xl py-3 text-center shadow-sm">
                         <span id="answer-display" class="text-5xl font-black text-[#ff85b3]">？</span>
                     </div>
                 </div>
-
                 <div class="h-[42%] flex-shrink-0">
                     <div id="keypad" class="grid grid-cols-3 gap-2 h-full">
                         <button class="keypad-btn" data-val="1">1</button>
@@ -375,16 +364,11 @@
                         <button id="check-button" class="keypad-btn !bg-[#98fb98] !text-white !border-[#6edb6e] text-lg" data-val="Enter">OK</button>
                     </div>
                     <div id="next-button-container" class="hidden h-full">
-                        <button id="next-button" class="w-full h-full btn-base kawaii-blue text-3xl rounded-3xl shadow-lg">
-                            つぎへ ➔
-                        </button>
+                        <button id="next-button" class="w-full h-full btn-base kawaii-blue text-3xl rounded-3xl shadow-lg">つぎへ ➔</button>
                     </div>
                 </div>
-
                 <div class="text-center pt-3 flex-shrink-0">
-                    <button id="reset-quiz-button" class="inline-block px-6 py-1 text-sm text-pink-400 font-bold bg-pink-50 rounded-full border border-pink-100 hover:bg-pink-100 transition">
-                        設定にもどる 🧸
-                    </button>
+                    <button id="reset-quiz-button" class="inline-block px-6 py-1 text-sm text-pink-400 font-bold bg-pink-50 rounded-full border border-pink-100 hover:bg-pink-100 transition">設定にもどる 🧸</button>
                 </div>
             </div>
 
@@ -394,9 +378,8 @@
                     <p class="text-6xl mb-2 floating">👑</p>
                     <h1 id="result-title" class="text-3xl font-black text-[#ff85b3]">おめでとう！</h1>
                 </div>
-                
                 <div class="flex flex-col items-center">
-                    <div class="w-48 h-48 bg-white border-8 border-dashed border-[#d4fcd9] rounded-full shadow-xl flex flex-col justify-center items-center relative">
+                    <div class="w-48 h-48 bg-white border-8 border-dashed border-[#d4fcd9] rounded-full shadow-xl flex flex-col justify-center items-center relative text-center">
                         <p class="text-sm text-gray-400 font-bold">スコア</p>
                         <p id="final-score" class="text-4xl font-black text-[#7ad18a] mt-1">0 / 0</p>
                         <div id="perfect-badge" class="hidden absolute -top-4 -right-4 bg-yellow-400 text-white font-black px-3 py-1 rounded-full shadow-lg border-2 border-white transform rotate-12 text-xs">PERFECT! ✨</div>
@@ -409,162 +392,135 @@
                         </div>
                     </div>
                 </div>
-                
-                <div class="w-full space-y-2">
-                    <div class="text-center">
-                        <span class="text-xs font-bold text-pink-300">XP +<span id="gained-xp">0</span> ゲット！</span>
+                <div class="w-full space-y-2 text-center">
+                    <div class="text-xs font-bold text-pink-300">
+                        XP +<span id="gained-xp">0</span> ゲット！
                     </div>
-                    <button id="review-button" class="w-full py-4 btn-base kawaii-purple text-xl rounded-2xl shadow-xl">
-                        もういっかい！ 🎀
-                    </button>
+                    <button id="review-button" class="w-full py-4 btn-base kawaii-purple text-xl rounded-2xl shadow-xl">もういっかい！ 🎀</button>
                 </div>
 
-                <!-- レベルアップモーダル -->
+                <!-- 各種モーダル -->
                 <div id="level-up-modal" class="modal-overlay hidden">
                     <div class="bg-white p-6 rounded-[2.5rem] rainbow-border shadow-2xl w-full text-center space-y-6 pop-up">
                         <div class="text-6xl animate-bounce">🆙✨</div>
-                        <div>
-                            <h2 class="text-3xl font-black text-pink-500">レベルアップ！</h2>
-                            <p class="text-xl font-bold text-gray-600 mt-2">Lv. <span id="new-level-display">2</span> になったよ！</p>
-                        </div>
-                        <div class="bg-orange-50 p-4 rounded-2xl border-2 border-orange-100">
-                            <p class="text-sm font-bold text-orange-400">お祝いプレゼント🎁</p>
-                            <div class="flex items-center justify-center space-x-2 mt-1">
-                                <span class="text-3xl">🎫</span>
-                                <span class="text-2xl font-black text-orange-500">× 1</span>
-                            </div>
-                        </div>
-                        <button id="close-level-up-btn" class="w-full py-4 btn-base kawaii-pink text-xl rounded-2xl shadow-md">
-                            やったー！ ✨
-                        </button>
+                        <h2 class="text-3xl font-black text-pink-500">レベルアップ！</h2>
+                        <p class="text-xl font-bold text-gray-600 mt-2">Lv. <span id="new-level-display">2</span> になったよ！</p>
+                        <button id="close-level-up-btn" class="w-full py-4 btn-base kawaii-pink text-xl rounded-2xl shadow-md">やったー！ ✨</button>
                     </div>
                 </div>
-
-                <!-- ガチャ確認モーダル -->
                 <div id="gacha-confirm-modal" class="modal-overlay hidden">
                     <div class="bg-white p-6 rounded-[2.5rem] border-4 border-orange-200 shadow-2xl w-full text-center space-y-6 pop-up">
                         <div class="text-5xl">🎫✨</div>
-                        <div>
-                            <p class="text-lg font-black text-gray-700">ガチャチケットを<br>ゲットしたよ！</p>
-                            <p class="text-sm font-bold text-orange-400 mt-2">いますぐ ガチャを<br>ひきにいく？</p>
-                        </div>
-                        <div class="flex flex-col space-y-3">
-                            <button id="confirm-gacha-yes" class="w-full py-4 btn-base kawaii-orange text-xl rounded-2xl shadow-md">
-                                ひきにいく！ ✨
-                            </button>
-                            <button id="confirm-gacha-no" class="w-full py-2 text-sm font-bold text-gray-400 hover:text-gray-600">
-                                あとでにする 🧸
-                            </button>
-                        </div>
+                        <p class="text-lg font-black text-gray-700">チケットをゲットしたよ！</p>
+                        <button id="confirm-gacha-yes" class="w-full py-4 btn-base kawaii-orange text-xl rounded-2xl shadow-md">ひきにいく！ ✨</button>
+                        <button id="confirm-gacha-no" class="w-full py-2 text-sm font-bold text-gray-400">あとで 🧸</button>
                     </div>
                 </div>
             </div>
 
-            <!-- がんばり記録画面 -->
-            <div id="record-screen" class="hidden h-full flex flex-col p-5 bg-[#fffdfd] overflow-hidden">
-                <div class="flex justify-between items-center mb-6">
+            <!-- がんばり記録 -->
+            <div id="record-screen" class="hidden h-full flex flex-col p-5 bg-[#fffdfd] overflow-hidden relative">
+                <div class="flex justify-between items-center mb-4 flex-shrink-0">
                     <h1 class="text-xl font-black text-gray-700">がんばり記録</h1>
                     <button id="close-record-btn" class="text-gray-400 text-2xl font-bold px-2">×</button>
                 </div>
 
-                <div class="flex-grow overflow-y-auto scroll-hide space-y-8 pb-10 px-1">
-                    <!-- ガチャコーナー -->
-                    <div class="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-3xl border-4 border-white shadow-sm relative">
+                <div class="flex-grow overflow-y-auto scroll-hide space-y-6 pb-10 px-1">
+                    <div class="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-3xl border-4 border-white shadow-sm relative text-center flex-shrink-0">
                         <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-base font-bold text-orange-500 flex items-center">
-                                <span class="mr-2">🎰</span> シールガチャ
-                            </h2>
+                            <h2 class="text-base font-bold text-orange-500 flex items-center"><span class="mr-2">🎰</span> ガチャ</h2>
                             <div class="bg-white px-3 py-1 rounded-full border-2 border-orange-200">
                                 <span class="text-xs font-bold text-orange-500">🎫: <span id="record-tickets">0</span></span>
                             </div>
                         </div>
-                        
-                        <div id="gacha-machine" class="flex flex-col items-center py-4 bg-white rounded-2xl mb-4 relative overflow-hidden">
+                        <div id="gacha-machine" class="flex flex-col items-center py-4 bg-white rounded-2xl mb-4 relative overflow-hidden text-center">
                             <div id="gacha-animation-area" class="text-6xl mb-4">🔮</div>
-                            <p id="gacha-status" class="text-[10px] text-gray-400 font-bold">チケット1まいで 1回ひけるよ！</p>
+                            <p id="gacha-status" class="text-[10px] text-gray-400 font-bold">1まいで 1回ひけるよ！</p>
                             
+                            <!-- ガチャ結果オーバーレイ -->
                             <div id="gacha-result-overlay" class="absolute inset-0 bg-white bg-opacity-95 flex flex-col items-center justify-center hidden">
+                                <div id="lucky-badge" class="hidden bg-yellow-400 text-white text-[10px] font-black px-2 py-0.5 rounded-full mb-1 animate-bounce">ラッキー！✨</div>
                                 <div class="text-5xl mb-2 pop-up" id="gacha-result-icon">🍓</div>
-                                <p class="text-sm font-bold text-pink-400" id="gacha-result-text">あたらしいシール！</p>
+                                <p class="text-sm font-bold text-pink-400" id="gacha-result-text">あたらしい！</p>
                                 <button id="gacha-close-result" class="mt-4 px-4 py-1 bg-pink-100 text-pink-500 rounded-full text-xs font-bold">とじる</button>
                             </div>
                         </div>
-                        
-                        <button id="gacha-pull-btn" class="w-full py-3 btn-base kawaii-orange text-lg rounded-2xl shadow-md disabled:opacity-50 disabled:grayscale">
-                            ガチャをひく！ ✨
-                        </button>
+                        <button id="gacha-pull-btn" class="w-full py-3 btn-base kawaii-orange text-lg rounded-2xl shadow-md disabled:opacity-50">ガチャをひく！ ✨</button>
                     </div>
 
-                    <!-- コンプリートモーダル -->
-                    <div id="sticker-complete-modal" class="modal-overlay hidden">
-                        <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 p-6 rounded-[2.5rem] border-4 border-yellow-400 shadow-2xl w-full text-center space-y-6 pop-up">
-                            <div class="text-7xl">🎉🎖️✨</div>
-                            <div>
-                                <h2 class="text-3xl font-black text-yellow-600">コンプリート！！</h2>
-                                <p class="text-lg font-bold text-gray-700 mt-2">50種類のシールを<br>ぜんぶ あつめたよ！</p>
-                                <p class="text-sm font-bold text-yellow-600 mt-1">すごすぎる！きみは<br>さんすうの天才だね！💖</p>
+                    <!-- 達成系モーダル -->
+                    <div id="page-complete-modal" class="modal-overlay hidden">
+                        <div class="bg-white p-6 rounded-[2.5rem] border-4 border-blue-300 shadow-2xl w-full text-center space-y-4 pop-up">
+                            <div class="text-6xl animate-bounce">🎁🎉</div>
+                            <h2 class="text-2xl font-black text-blue-500">1ページ 完成！</h2>
+                            <p class="text-sm font-bold text-gray-600">おめでとう！<br>プレゼントをあげるよ！</p>
+                            <div class="bg-orange-50 p-3 rounded-2xl border-2 border-orange-100 flex items-center justify-center space-x-2">
+                                <span class="text-3xl">🎫</span>
+                                <span class="text-2xl font-black text-orange-500">× 3</span>
                             </div>
-                            <button id="close-complete-btn" class="w-full py-4 btn-base kawaii-gold text-xl rounded-2xl shadow-md">
-                                やったーー！！ ✨
-                            </button>
+                            <button id="close-page-complete-btn" class="w-full py-3 btn-base kawaii-blue text-lg rounded-xl">やったー！</button>
                         </div>
                     </div>
 
-                    <div class="bg-white p-4 rounded-3xl border-2 border-pink-50 shadow-sm">
+                    <div id="grand-complete-modal" class="modal-overlay hidden">
+                        <div class="bg-gradient-to-br from-yellow-50 via-white to-yellow-100 p-6 rounded-[3rem] border-8 border-yellow-400 shadow-2xl w-full text-center space-y-6 pop-up rainbow-border">
+                            <div class="text-7xl">🎉👑🎖️</div>
+                            <h2 class="text-3xl font-black text-yellow-600">努力の天才！<br>ぜんぶあつめたよ！</h2>
+                            <p class="text-base font-bold text-gray-700 leading-relaxed">50しゅるいのシールを<br>ぜんぶあつめたきみは、<br>さんすうの王様だね！✨</p>
+                            <div class="bg-pink-50 p-4 rounded-3xl border-2 border-pink-200"><p class="text-sm font-black text-pink-500">お父さん・お母さんに<br>「本物のシール」を<br>おねだりしてみてね！🎁</p></div>
+                            <button id="reset-collection-btn" class="w-full py-5 btn-base kawaii-gold text-2xl rounded-3xl shadow-xl">OK！つぎへ！ 🚀</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-3xl border-2 border-pink-50 shadow-sm flex-shrink-0 text-left">
                         <div class="flex items-center space-x-4">
                             <div class="bg-pink-400 w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-black">
                                 <span id="record-level">1</span>
                             </div>
                             <div class="flex-grow">
                                 <div class="flex justify-between items-end mb-1">
-                                    <span class="text-[11px] font-bold text-pink-500" id="record-rank">すうじの妖精</span>
+                                    <span class="text-[11px] font-bold text-pink-500" id="record-rank">称号</span>
                                     <span class="text-[10px] text-gray-400 font-bold">あと <span id="next-level-xp">50</span> XP</span>
                                 </div>
                                 <div class="w-full h-4 bg-gray-100 rounded-full overflow-hidden border border-pink-50">
                                     <div id="record-xp-bar" class="h-full bg-pink-400" style="width: 30%"></div>
                                 </div>
+                                <p id="lap-display-record" class="text-[9px] text-blue-400 font-bold mt-1 hidden">🏁 <span id="display-lap-record">1</span>しゅうめ</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="space-y-3">
-                        <div class="flex justify-between items-center">
-                            <h2 class="text-base font-bold text-gray-600 flex items-center">
-                                <span class="mr-2">⭐</span> スタンプカード
-                            </h2>
-                            <div id="weekly-reward-indicator" class="hidden text-[10px] bg-green-100 text-green-600 px-2 py-0.5 rounded-full font-bold">5こ達成！ 🎫+3</div>
-                        </div>
-                        <div class="bg-white p-4 rounded-3xl border-2 border-pink-50 shadow-sm flex justify-between px-4">
-                            <div class="flex flex-col items-center"><span class="stamp-slot text-2xl" id="stamp-0">⚪</span><span class="text-[8px] text-gray-300 mt-1">Sun</span></div>
-                            <div class="flex flex-col items-center"><span class="stamp-slot text-2xl" id="stamp-1">⚪</span><span class="text-[8px] text-gray-300 mt-1">Mon</span></div>
-                            <div class="flex flex-col items-center"><span class="stamp-slot text-2xl" id="stamp-2">⚪</span><span class="text-[8px] text-gray-300 mt-1">Tue</span></div>
-                            <div class="flex flex-col items-center"><span class="stamp-slot text-2xl" id="stamp-3">⚪</span><span class="text-[8px] text-gray-300 mt-1">Wed</span></div>
-                            <div class="flex flex-col items-center"><span class="stamp-slot text-2xl" id="stamp-4">⚪</span><span class="text-[8px] text-gray-300 mt-1">Thu</span></div>
-                            <div class="flex flex-col items-center"><span class="stamp-slot text-2xl" id="stamp-5">⚪</span><span class="text-[8px] text-gray-300 mt-1">Fri</span></div>
-                            <div class="flex flex-col items-center"><span class="stamp-slot text-2xl" id="stamp-6">⚪</span><span class="text-[8px] text-gray-300 mt-1">Sat</span></div>
-                        </div>
-                        <p id="weekly-status-text" class="text-[9px] text-center text-gray-400 font-bold"></p>
-                    </div>
-
-                    <div class="space-y-3">
-                        <h2 class="text-base font-bold text-gray-600 flex items-center">
-                            <span class="mr-2">🍓</span> シール帳（<span id="sticker-count-display">0</span> / 50）
+                    <div class="space-y-6">
+                        <h2 class="text-base font-bold text-gray-600 flex items-center px-1">
+                            <span class="mr-2">🍓</span> ビンゴシールちょう
                         </h2>
-                        <div id="sticker-grid" class="grid grid-cols-5 gap-2 bg-white p-4 rounded-3xl border-2 border-pink-50 shadow-sm"></div>
+                        <div class="bg-white p-3 rounded-3xl border-2 border-blue-50 shadow-sm">
+                            <p class="text-xs font-bold text-blue-400 mb-2 px-1">1ページ目 (1-25)</p>
+                            <div id="sticker-grid-1" class="grid grid-cols-5 gap-1.5 relative"></div>
+                        </div>
+                        <div class="bg-white p-3 rounded-3xl border-2 border-pink-50 shadow-sm">
+                            <p class="text-xs font-bold text-pink-400 mb-2 px-1">2ページ目 (26-50)</p>
+                            <div id="sticker-grid-2" class="grid grid-cols-5 gap-1.5 relative"></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
+            <div id="sticker-complete-modal" class="modal-overlay hidden">
+                <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 p-6 rounded-[2.5rem] border-4 border-yellow-400 shadow-2xl w-full text-center space-y-6 pop-up">
+                    <div class="text-7xl">🎉🎖️✨</div>
+                    <h2 class="text-3xl font-black text-yellow-600">ビンゴ！</h2>
+                    <button id="close-complete-btn" class="w-full py-4 btn-base kawaii-gold text-xl rounded-2xl shadow-md">やったーー！！ ✨</button>
+                </div>
+            </div>
         </div>
     </div>
 
 <script>
-    // --- 効果音マネージャー ---
+    // --- 効果音 ---
     const SoundManager = {
         ctx: null,
-        init() {
-            if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-        },
+        init() { if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
         play(freq, type, duration, vol = 0.1) {
             if (!this.ctx) return;
             const osc = this.ctx.createOscillator();
@@ -573,76 +529,39 @@
             osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
             gain.gain.setValueAtTime(vol, this.ctx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
-            osc.connect(gain);
-            gain.connect(this.ctx.destination);
-            osc.start();
-            osc.stop(this.ctx.currentTime + duration);
+            osc.connect(gain); gain.connect(this.ctx.destination);
+            osc.start(); osc.stop(this.ctx.currentTime + duration);
         },
         click() { this.play(800, 'sine', 0.1); },
-        correct() {
-            this.play(523.25, 'sine', 0.3); // C5
-            setTimeout(() => this.play(659.25, 'sine', 0.3), 100); // E5
-        },
-        incorrect() {
-            this.play(200, 'square', 0.3, 0.05);
-            setTimeout(() => this.play(150, 'square', 0.3, 0.05), 150);
-        },
-        levelUp() {
-            [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
-                setTimeout(() => this.play(f, 'sine', 0.5), i * 100);
-            });
-        },
+        correct() { this.play(523.25, 'sine', 0.3); setTimeout(() => this.play(659.25, 'sine', 0.3), 100); },
+        incorrect() { this.play(200, 'square', 0.3, 0.05); setTimeout(() => this.play(150, 'square', 0.3, 0.05), 150); },
+        levelUp() { [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => setTimeout(() => this.play(f, 'sine', 0.5), i * 100)); },
         gachaShake() { this.play(Math.random() * 100 + 400, 'sawtooth', 0.05, 0.02); },
-        gachaResult() {
-            [880, 1046, 1318].forEach((f, i) => {
-                setTimeout(() => this.play(f, 'sine', 0.4), i * 80);
-            });
-        },
-        complete() {
-            const notes = [523, 659, 783, 1046, 783, 1046, 1318];
-            notes.forEach((f, i) => setTimeout(() => this.play(f, 'sine', 0.6), i * 150));
-        }
+        gachaResult() { [880, 1046, 1318].forEach((f, i) => setTimeout(() => this.play(f, 'sine', 0.4), i * 80)); },
+        complete() { [523, 659, 783, 1046, 783, 1046, 1318, 1567].forEach((f, i) => setTimeout(() => this.play(f, 'sine', 0.7), i * 120)); },
+        bingo() { [783.99, 880, 987.77, 1046.50].forEach((f, i) => setTimeout(() => this.play(f, 'sine', 0.6), i * 100)); }
     };
 
-    // --- 定数 ---
-    const FINAL_STICKERS = [
-        "🍓", "🎀", "🦄", "🍦", "🍭", "👑", "🧸", "🎨", "🌈", "🪄", 
-        "🍪", "🌟", "🐱", "🐶", "🍒", "💎", "🍎", "🍑", "🍊", "🍉", 
-        "🍇", "🥞", "🍩", "🧁", "🍮", "🍫", "🍰", "🥨", "🍬", "🍨", 
-        "🍿", "🥤", "🍙", "🍡", "🐼", "🎈", "🎊", "🎁", "👗", "💄", 
-        "💍", "🎒", "👒", "🌸", "🌷", "🌼", "🌻", "🍀", "🦋", "🐰"
-    ];
+    const FINAL_STICKERS = ["🍓", "🎀", "🦄", "🍦", "🍭", "👑", "🧸", "🎨", "🌈", "🪄", "🍪", "🌟", "🐱", "🐶", "🍒", "💎", "🍎", "🍑", "🍊", "🍉", "🍇", "🥞", "🍩", "🧁", "🍮", "🍫", "🍰", "🥨", "🍬", "🍨", "🍿", "🥤", "🍙", "🍡", "🐼", "🎈", "🎊", "🎁", "👗", "💄", "💍", "🎒", "👒", "🌸", "🌷", "🌼", "🌻", "🍀", "🦋", "🐰"];
+    const RANKS = ["すうじの妖精", "さんすう見習い", "計算のプリンセス", "きらきらスター", "魔法の算数使い", "きらめきマジシャン", "数の守護者", "伝説の計算手", "算数マスター ✨", "知恵の女神", "宇宙一の天才", "銀河の覇者 👑"];
+    const SAVE_KEY = "kawaii_arithmetic_save_v7_lucky";
 
-    const RANKS = [
-        "すうじの妖精", "さんすう見習い", "計算のプリンセス", "きらきらスター",
-        "魔法の算数使い", "きらめきマジシャン", "数の守護者", "伝説の計算手",
-        "算数マスター ✨", "知恵の女神", "宇宙一の天才", "銀河の覇者 👑"
-    ];
-
-    const SAVE_KEY = "kawaii_arithmetic_save_v2";
-
-    // --- 状態 ---
     let userData = {
-        xp: 0,
-        level: 1,
-        tickets: 0,
-        stickers: [], 
-        stamps: [],
-        claimedWeeklyBonus: "",
-        lastOperation: "add",
-        hasSeenTutorial: false 
+        xp: 0, level: 1, tickets: 0, stickers: [], stamps: [], claimedWeeklyBonus: "", lastOperation: "add", hasSeenTutorial: false,
+        clearedDans: { add: [], sub: [], mul: [], div: [] },
+        bingosClaimed: [], lapCount: 1, pageRewardsClaimed: []
     };
 
-    let quizState = {
-        problems: [],
-        currentIndex: 0,
-        correctCount: 0,
-        currentCombo: 0,
-        isAwaitingNext: false,
-        currentInput: ""
-    };
-
+    let quizState = { problems: [], currentIndex: 0, correctCount: 0, currentCombo: 0, isAwaitingNext: false, currentInput: "" };
     let elements = {};
+
+    function getXpRequiredForLevel(level) { return Math.floor((level - 1) / 10 + 1) * 100; }
+
+    function calculateLevelFromXp(totalXp) {
+        let currentLevel = 1; let remainingXp = totalXp; let requiredForNext = getXpRequiredForLevel(currentLevel);
+        while (remainingXp >= requiredForNext) { remainingXp -= requiredForNext; currentLevel++; requiredForNext = getXpRequiredForLevel(currentLevel); }
+        return { level: currentLevel, xpInLevel: remainingXp, requiredXp: requiredForNext };
+    }
 
     function showScreen(screenName) {
         const screens = [elements.settingsScreen, elements.quizScreen, elements.resultsScreen, elements.recordScreen];
@@ -657,455 +576,254 @@
         const saved = localStorage.getItem(SAVE_KEY);
         if (saved) {
             userData = JSON.parse(saved);
+            if (!userData.clearedDans) userData.clearedDans = { add: [], sub: [], mul: [], div: [] };
         } else {
-            userData.tickets = 1;
-            userData.lastOperation = "add";
-            userData.hasSeenTutorial = false;
-            saveData();
+            userData.tickets = 1; saveData();
         }
         updateAllUI();
     }
 
-    function saveData() {
-        localStorage.setItem(SAVE_KEY, JSON.stringify(userData));
-    }
+    function saveData() { localStorage.setItem(SAVE_KEY, JSON.stringify(userData)); }
 
-    function updateAllUI() {
-        updateTopBar();
-        updateRecordUI();
-        checkWeeklyStamps();
-    }
+    function updateAllUI() { updateTopBar(); updateRecordUI(); updateDanSelectOptions(); }
 
     function updateTopBar() {
+        const lvInfo = calculateLevelFromXp(userData.xp);
         if (elements.displayXp) elements.displayXp.textContent = userData.xp;
-        if (elements.displayLevel) elements.displayLevel.textContent = userData.level;
+        if (elements.displayLevel) elements.displayLevel.textContent = lvInfo.level;
         if (elements.displayTickets) elements.displayTickets.textContent = userData.tickets;
-        if (elements.displayXpBar) {
-            const currentXPInLevel = userData.xp % 100;
-            elements.displayXpBar.style.width = `${currentXPInLevel}%`;
+        if (elements.displayXpBar) elements.displayXpBar.style.width = `${(lvInfo.xpInLevel / lvInfo.requiredXp) * 100}%`;
+        if (userData.lapCount > 1) {
+            if (elements.lapDisplayTop) elements.lapDisplayTop.classList.remove('hidden');
+            if (elements.displayLap) elements.displayLap.textContent = userData.lapCount;
         }
     }
 
-    // 週番号を取得する関数
-    function getWeekIdentifier(date) {
-        const d = new Date(date);
-        d.setHours(0,0,0,0);
-        d.setDate(d.getDate() + 4 - (d.getDay() || 7));
-        const yearStart = new Date(d.getFullYear(),0,1);
-        return d.getFullYear() + "-" + Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    function updateDanSelectOptions() {
+        if (!elements.danSelect) return;
+        const op = document.querySelector('input[name="operation"]:checked')?.value || userData.lastOperation || "add";
+        const clearedList = userData.clearedDans[op] || [];
+        elements.danSelect.innerHTML = "";
+        let availableCount = 0;
+        for (let i = 1; i <= 9; i++) {
+            const opt = document.createElement('option');
+            opt.value = i;
+            if (clearedList.includes(i)) { opt.textContent = `✅ ${i} クリア！`; opt.disabled = true; }
+            else { opt.textContent = `${i} のかず`; availableCount++; }
+            elements.danSelect.appendChild(opt);
+        }
+        if (availableCount === 0 && clearedList.length > 0) { userData.clearedDans[op] = []; saveData(); updateDanSelectOptions(); }
     }
 
-    function checkWeeklyStamps() {
-        const now = new Date();
-        const startOfWeek = new Date(now);
-        startOfWeek.setDate(now.getDate() - now.getDay());
-        startOfWeek.setHours(0,0,0,0);
-        const weekId = getWeekIdentifier(now);
-        const stampsThisWeek = userData.stamps.filter(s => new Date(s) >= startOfWeek).length;
-
-        if (stampsThisWeek >= 5 && userData.claimedWeeklyBonus !== weekId) {
-            userData.claimedWeeklyBonus = weekId;
-            awardTicket(3);
-        }
-
-        const isClaimed = userData.claimedWeeklyBonus === weekId;
-        if (elements.weeklyRewardIndicator) elements.weeklyRewardIndicator.classList.toggle('hidden', !isClaimed);
-        if (elements.weeklyStatusText) {
-            elements.weeklyStatusText.textContent = isClaimed ? "今週のボーナスは ゲット済みだよ！" : `今週 あと ${Math.max(0, 5 - stampsThisWeek)}回 あそぶと チケット3まい！`;
-        }
-
-        // スタンプの表示（🌸）
-        for (let i = 0; i < 7; i++) {
-            const date = new Date(startOfWeek);
-            date.setDate(startOfWeek.getDate() + i);
-            const dateStr = date.toISOString().split('T')[0];
-            const slot = document.getElementById(`stamp-${i}`);
-            if (slot) {
-                slot.textContent = userData.stamps.includes(dateStr) ? "🌸" : "⚪";
-                slot.style.opacity = userData.stamps.includes(dateStr) ? "1" : "0.3";
-            }
-        }
-    }
-
-    function awardTicket(count = 1) {
-        userData.tickets += count;
-        saveData();
-        updateAllUI();
-    }
+    function awardTicket(count = 1) { userData.tickets += count; saveData(); updateTopBar(); if(elements.recordTickets) elements.recordTickets.textContent = userData.tickets; }
 
     function addXP(amount) {
-        const oldLevel = userData.level;
+        const oldLvInfo = calculateLevelFromXp(userData.xp);
         userData.xp += amount;
-        userData.level = Math.floor(userData.xp / 100) + 1;
-        
-        const leveledUp = userData.level > oldLevel;
-        if (leveledUp) {
-            userData.tickets += (userData.level - oldLevel);
-        }
-        
-        saveData();
-        updateAllUI();
-        return leveledUp;
+        const newLvInfo = calculateLevelFromXp(userData.xp);
+        const leveledUp = newLvInfo.level > oldLvInfo.level;
+        if (leveledUp) awardTicket(newLvInfo.level - oldLvInfo.level);
+        saveData(); updateTopBar(); return leveledUp;
     }
 
     function triggerConfetti() {
-        const emojis = ["✨", "💖", "🎀", "🌟", "🌸", "🧁", "🏅"];
+        const emojis = ["✨", "💖", "🎀", "🌟", "🌸", "🧁", "🏅", "🎫"];
         if (!elements.confettiContainer) return;
         for (let i = 0; i < 40; i++) {
             const el = document.createElement('div');
-            el.className = 'confetti';
-            el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-            el.style.left = Math.random() * 100 + 'vw';
-            el.style.fontSize = (Math.random() * 20 + 20) + 'px';
+            el.className = 'confetti'; el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            el.style.left = Math.random() * 100 + 'vw'; el.style.fontSize = (Math.random() * 20 + 20) + 'px';
             el.style.transition = `all ${Math.random() * 2 + 2}s linear`;
             elements.confettiContainer.appendChild(el);
-            setTimeout(() => {
-                el.style.transform = `translateY(${window.innerHeight + 100}px) rotate(${Math.random() * 360}deg)`;
-                el.style.opacity = '0';
-            }, 10);
+            setTimeout(() => { el.style.transform = `translateY(${window.innerHeight + 100}px) rotate(${Math.random() * 360}deg)`; el.style.opacity = '0'; }, 10);
             setTimeout(() => el.remove(), 4000);
+        }
+    }
+
+    function checkBingo() {
+        let found = false;
+        for (let g = 0; g < 2; g++) {
+            const base = g * 25; const has = (r, c) => userData.stickers.includes(base + r * 5 + c);
+            for (let r = 0; r < 5; r++) { const id = `g${g}-r${r}`; if (!userData.bingosClaimed.includes(id) && [0,1,2,3,4].every(c => has(r,c))) { userData.bingosClaimed.push(id); found = true; } }
+            for (let c = 0; c < 5; c++) { const id = `g${g}-c${c}`; if (!userData.bingosClaimed.includes(id) && [0,1,2,3,4].every(r => has(r,c))) { userData.bingosClaimed.push(id); found = true; } }
+            if (!userData.bingosClaimed.includes(`g${g}-d1`) && [0,1,2,3,4].every(i => has(i,i))) { userData.bingosClaimed.push(`g${g}-d1`); found = true; }
+            if (!userData.bingosClaimed.includes(`g${g}-d2`) && [0,1,2,3,4].every(i => has(i, 4-i))) { userData.bingosClaimed.push(`g${g}-d2`); found = true; }
+        }
+        if (found) { awardTicket(1); SoundManager.bingo(); triggerConfetti(); if(elements.stickerCompleteModal) elements.stickerCompleteModal.classList.remove('hidden'); saveData(); }
+    }
+
+    function checkCollectionProgress() {
+        const p1Full = Array.from({length:25},(_,i)=>i).every(i=>userData.stickers.includes(i));
+        const p2Full = Array.from({length:25},(_,i)=>i+25).every(i=>userData.stickers.includes(i));
+        if (p1Full && !userData.pageRewardsClaimed.includes(1)) { userData.pageRewardsClaimed.push(1); awardTicket(3); SoundManager.levelUp(); if(elements.pageCompleteModal) elements.pageCompleteModal.classList.remove('hidden'); triggerConfetti(); }
+        if (p2Full && !userData.pageRewardsClaimed.includes(2)) { userData.pageRewardsClaimed.push(2); awardTicket(3); SoundManager.levelUp(); if(elements.pageCompleteModal) elements.pageCompleteModal.classList.remove('hidden'); triggerConfetti(); }
+        if (userData.stickers.length === 50) {
+            setTimeout(() => {
+                if (elements.gachaResultOverlay) elements.gachaResultOverlay.classList.add('hidden');
+                if (elements.nextLapDisplay) elements.nextLapDisplay.textContent = userData.lapCount + 1;
+                if (elements.grandCompleteModal) elements.grandCompleteModal.classList.remove('hidden');
+                SoundManager.complete(); triggerConfetti();
+            }, 2000);
         }
     }
 
     function pullGacha() {
         if (userData.tickets <= 0) return;
-        userData.tickets--;
-        saveData();
-        updateAllUI();
-
+        userData.tickets--; saveData(); updateTopBar();
         if (elements.gachaPullBtn) elements.gachaPullBtn.disabled = true;
-        if (elements.gachaAnimArea) {
-            elements.gachaAnimArea.textContent = "📦";
-            elements.gachaAnimArea.classList.add('gacha-shake');
-        }
-        if (elements.gachaStatus) elements.gachaStatus.textContent = "なにが でるかな...？";
+        
+        if (elements.luckyBadge) elements.luckyBadge.classList.add('hidden'); // ラッキーバッジを隠す
 
         const shakeInterval = setInterval(() => SoundManager.gachaShake(), 100);
-
         setTimeout(() => {
             clearInterval(shakeInterval);
-            if (elements.gachaAnimArea) elements.gachaAnimArea.classList.remove('gacha-shake');
-            if (elements.gachaAnimArea) elements.gachaAnimArea.textContent = "💥";
-            setTimeout(() => {
-                const randomIndex = Math.floor(Math.random() * FINAL_STICKERS.length);
-                const isNew = !userData.stickers.includes(randomIndex);
-                if (isNew) {
-                    userData.stickers.push(randomIndex);
-                    saveData();
-                    triggerConfetti();
-                }
-                SoundManager.gachaResult(); 
-                if (elements.gachaResultIcon) elements.gachaResultIcon.textContent = FINAL_STICKERS[randomIndex];
-                if (elements.gachaResultText) elements.gachaResultText.textContent = isNew ? "あたらしいシール！✨" : "もってるシールだったよ🧸";
-                if (elements.gachaResultOverlay) elements.gachaResultOverlay.classList.remove('hidden');
-                updateRecordUI();
+            
+            const unowned = Array.from({length:50},(_,i)=>i).filter(i=>!userData.stickers.includes(i));
+            let randomIndex = Math.floor(Math.random() * 50);
+            let isLuckyReRoll = false;
 
-                if (userData.stickers.length === FINAL_STICKERS.length && isNew) {
-                    setTimeout(() => {
-                        SoundManager.complete(); 
-                        if (elements.gachaResultOverlay) elements.gachaResultOverlay.classList.add('hidden');
-                        if (elements.stickerCompleteModal) elements.stickerCompleteModal.classList.remove('hidden');
-                        triggerConfetti();
-                        setTimeout(triggerConfetti, 500);
-                    }, 2000);
-                }
-            }, 500);
+            // 再抽選ロジック
+            if (userData.stickers.includes(randomIndex) && unowned.length > 0 && Math.random() < 0.15) {
+                randomIndex = unowned[Math.floor(Math.random() * unowned.length)];
+                isLuckyReRoll = true; // ラッキー発生！
+            }
+
+            const isNew = !userData.stickers.includes(randomIndex);
+            if (isNew) { userData.stickers.push(randomIndex); saveData(); triggerConfetti(); }
+            
+            SoundManager.gachaResult();
+            if (elements.gachaResultIcon) elements.gachaResultIcon.textContent = FINAL_STICKERS[randomIndex];
+            if (elements.gachaResultText) elements.gachaResultText.textContent = isNew ? "あたらしい！✨" : "もってるよ🧸";
+            
+            // ラッキー演出の表示
+            if (isLuckyReRoll && elements.luckyBadge) {
+                elements.luckyBadge.classList.remove('hidden');
+            }
+
+            if (elements.gachaResultOverlay) elements.gachaResultOverlay.classList.remove('hidden');
+            
+            checkBingo(); checkCollectionProgress(); updateRecordUI();
         }, 1200);
     }
 
     function generateProblems() {
         const op = document.querySelector('input[name="operation"]:checked').value;
         const mode = document.querySelector('input[name="mode"]:checked').value;
-        const order = document.querySelector('input[name="order"]:checked').value;
         const dan = parseInt(elements.danSelect.value, 10);
-        let p = [];
-        const range = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-
-        if (op === 'mul') {
-            const targets = mode === 'dan' ? [dan] : range;
-            targets.forEach(n1 => range.forEach(n2 => p.push({ n1, n2, op: '×', ans: n1 * n2 })));
-        } else if (op === 'add') {
-            const targets = mode === 'dan' ? [dan] : range;
-            targets.forEach(n1 => range.forEach(n2 => p.push({ n1, n2, op: '＋', ans: n1 + n2 })));
-        } else if (op === 'sub') {
-            const targets = mode === 'dan' ? [dan] : range;
-            targets.forEach(n2 => range.forEach(ans => p.push({ n1: ans + n2, n2, op: '－', ans })));
-        } else if (op === 'div') {
-            const targets = mode === 'dan' ? [dan] : range;
-            targets.forEach(n2 => range.forEach(ans => p.push({ n1: ans * n2, n2, op: '÷', ans })));
+        let p = []; const range = [1,2,3,4,5,6,7,8,9]; const sym = {add:'＋', sub:'－', mul:'×', div:'÷'};
+        if (mode === 'dan') {
+            if (op === 'mul') range.forEach(n2 => p.push({n1:dan, n2, op:sym[op], ans:dan*n2}));
+            else if (op === 'add') range.forEach(n2 => p.push({n1:dan, n2, op:sym[op], ans:dan+n2}));
+            else if (op === 'sub') range.forEach(ans => p.push({n1:ans+dan, n2:dan, op:sym[op], ans}));
+            else if (op === 'div') range.forEach(ans => p.push({n1:ans*dan, n2:dan, op:sym[op], ans}));
+        } else {
+            range.forEach(n1 => range.forEach(n2 => {
+                if(op==='mul') p.push({n1, n2, op:sym[op], ans:n1*n2});
+                else if(op==='add') p.push({n1, n2, op:sym[op], ans:n1+n2});
+                else if(op==='sub') p.push({n1:n1+n2, n2, op:sym[op], ans:n1});
+                else if(op==='div') p.push({n1:n1*n2, n2, op:sym[op], ans:n1});
+            }));
+            p = [...p].sort(() => Math.random() - 0.5).slice(0, 10);
         }
-        
-        if (mode === 'all') {
-            p = shuffleArray(p).slice(0, 10);
-            if (order === 'sequential') p.sort((a, b) => (a.n1 - b.n1) || (a.n2 - b.n2));
-        } else if (order === 'random') p = shuffleArray(p);
-        
-        quizState.problems = p;
-        quizState.currentIndex = 0;
-        quizState.correctCount = 0;
-        quizState.currentCombo = 0;
+        if (document.querySelector('input[name="order"]:checked').value === 'random') p = [...p].sort(() => Math.random() - 0.5);
+        quizState.problems = p; quizState.currentIndex = 0; quizState.correctCount = 0; quizState.currentCombo = 0;
     }
 
     function displayCurrentProblem() {
-        const problem = quizState.problems[quizState.currentIndex];
-        if (!problem) return;
-        quizState.currentInput = "";
-        elements.answerDisplay.textContent = "？";
-        elements.answerDisplay.style.color = "#ff85b3";
-        elements.keypad.classList.remove('hidden');
-        elements.nextButtonContainer.classList.add('hidden');
-        elements.problemText.textContent = `${problem.n1} ${problem.op} ${problem.n2}`;
-        elements.progressText.textContent = `${quizState.currentIndex + 1} / ${quizState.problems.length}`;
+        const problem = quizState.problems[quizState.currentIndex]; if (!problem) return;
+        quizState.currentInput = ""; if (elements.answerDisplay) elements.answerDisplay.textContent = "？";
+        if (elements.keypad) elements.keypad.classList.remove('hidden');
+        if (elements.nextButtonContainer) elements.nextButtonContainer.classList.add('hidden');
+        if (elements.problemText) elements.problemText.textContent = `${problem.n1} ${problem.op} ${problem.n2}`;
+        if (elements.progressText) elements.progressText.textContent = `${quizState.currentIndex + 1} / ${quizState.problems.length}`;
     }
 
     function checkAnswer() {
-        if (quizState.isAwaitingNext || quizState.currentInput === "") return;
         const problem = quizState.problems[quizState.currentIndex];
         const userAnswer = parseInt(quizState.currentInput, 10);
-        elements.keypad.classList.add('hidden');
-        elements.nextButtonContainer.classList.remove('hidden');
-
+        elements.keypad.classList.add('hidden'); elements.nextButtonContainer.classList.remove('hidden');
         if (userAnswer === problem.ans) {
-            quizState.correctCount++;
-            quizState.currentCombo++;
-            SoundManager.correct(); 
+            quizState.correctCount++; quizState.currentCombo++; SoundManager.correct();
             elements.answerDisplay.textContent = "○ せいかい！";
-            elements.answerDisplay.style.color = "#7ad18a";
             if (quizState.currentCombo >= 2) {
                 if (elements.comboCount) elements.comboCount.textContent = quizState.currentCombo;
-                if (elements.comboDisplay) {
-                    elements.comboDisplay.classList.remove('hidden');
-                    setTimeout(() => { if (elements.comboDisplay) elements.comboDisplay.classList.add('hidden'); }, 800);
-                }
+                if (elements.comboDisplay) { elements.comboDisplay.classList.remove('hidden'); setTimeout(() => elements.comboDisplay.classList.add('hidden'), 800); }
             }
-        } else {
-            quizState.currentCombo = 0;
-            SoundManager.incorrect(); 
-            elements.answerDisplay.textContent = `× こたえ:${problem.ans}`;
-            elements.answerDisplay.style.color = "#ff85b3";
-        }
+        } else { quizState.currentCombo = 0; SoundManager.incorrect(); elements.answerDisplay.textContent = `× こたえ:${problem.ans}`; }
         quizState.isAwaitingNext = true;
     }
 
-    function nextProblem() {
-        SoundManager.click();
-        quizState.isAwaitingNext = false;
-        quizState.currentIndex++;
-        if (quizState.currentIndex < quizState.problems.length) {
-            displayCurrentProblem();
-        } else {
-            finishQuiz();
-        }
-    }
-
     function finishQuiz() {
-        const total = quizState.problems.length;
-        const correct = quizState.correctCount;
-        const isPerfect = (correct === total);
-        let xpGained = correct * 5;
-        if (isPerfect) xpGained += 20;
-
+        const total = quizState.problems.length; const correct = quizState.correctCount; const isPerfect = (correct === total);
+        const op = document.querySelector('input[name="operation"]:checked').value; const mode = document.querySelector('input[name="mode"]:checked').value;
+        const dan = parseInt(elements.danSelect.value, 10);
+        if (mode === 'dan' && isPerfect) { if (!userData.clearedDans[op].includes(dan)) userData.clearedDans[op].push(dan); }
+        let xpGained = correct * 5 + (isPerfect ? 20 : 0);
+        const leveledUp = addXP(xpGained); if (isPerfect) awardTicket(1);
         if (elements.finalScore) elements.finalScore.textContent = `${correct} / ${total}`;
-        if (elements.gainedXP) elements.gainedXP.textContent = xpGained;
+        if (elements.gainedXp) elements.gainedXp.textContent = xpGained;
         showScreen('results');
-
-        const leveledUp = addXP(xpGained);
-        if (isPerfect) awardTicket(1); 
-
-        const runSequence = async () => {
-            if (isPerfect) {
-                if (elements.perfectBadge) elements.perfectBadge.classList.remove('hidden');
-                if (elements.ticketGetBox) elements.ticketGetBox.classList.remove('hidden');
-                triggerConfetti();
-                await new Promise(r => setTimeout(r, 1500));
-            }
-
-            if (leveledUp) {
-                SoundManager.levelUp(); 
-                if (elements.levelUpModal) {
-                    if (elements.newLevelDisplay) elements.newLevelDisplay.textContent = userData.level;
-                    elements.levelUpModal.classList.remove('hidden');
-                    triggerConfetti();
-                }
-            } else if (isPerfect) {
-                if (elements.gachaConfirmModal) elements.gachaConfirmModal.classList.remove('hidden');
-            }
-        };
-        runSequence();
+        (async () => {
+            if (isPerfect) { triggerConfetti(); await new Promise(r => setTimeout(r, 1000)); }
+            if (leveledUp) { SoundManager.levelUp(); const lv = calculateLevelFromXp(userData.xp).level; if (elements.newLevelDisplay) elements.newLevelDisplay.textContent = lv; if (elements.levelUpModal) elements.levelUpModal.classList.remove('hidden'); }
+            else if (isPerfect) if (elements.gachaConfirmModal) elements.gachaConfirmModal.classList.remove('hidden');
+        })();
+        saveData();
     }
 
     function updateRecordUI() {
-        if (elements.recordLevel) elements.recordLevel.textContent = userData.level;
-        if (elements.recordRank) {
-            const rankIdx = Math.min(RANKS.length - 1, Math.floor((userData.level - 1) / 5));
-            elements.recordRank.textContent = RANKS[rankIdx];
-        }
-        if (elements.recordXpBar) elements.recordXpBar.style.width = `${userData.xp % 100}%`;
-        if (elements.nextLevelXp) elements.nextLevelXp.textContent = 100 - (userData.xp % 100);
+        const lvInfo = calculateLevelFromXp(userData.xp);
+        if (elements.recordLevel) elements.recordLevel.textContent = lvInfo.level;
+        if (elements.recordRank) elements.recordRank.textContent = RANKS[Math.min(RANKS.length - 1, Math.floor((lvInfo.level - 1) / 5))];
+        if (elements.recordXpBar) elements.recordXpBar.style.width = `${(lvInfo.xpInLevel / lvInfo.requiredXp) * 100}%`;
+        if (elements.nextLevelXp) elements.nextLevelXp.textContent = lvInfo.requiredXp - lvInfo.xpInLevel;
         if (elements.recordTickets) elements.recordTickets.textContent = userData.tickets;
         if (elements.gachaPullBtn) elements.gachaPullBtn.disabled = (userData.tickets <= 0);
         if (elements.stickerCountDisplay) elements.stickerCountDisplay.textContent = userData.stickers.length;
-        
-        if (elements.stickerGrid) {
-            elements.stickerGrid.innerHTML = "";
-            FINAL_STICKERS.forEach((emoji, idx) => {
-                const slot = document.createElement('div');
+        if (userData.lapCount > 1) { if(elements.lapDisplayRecord) elements.lapDisplayRecord.classList.remove('hidden'); if(elements.displayLapRecord) elements.displayLapRecord.textContent = userData.lapCount; }
+        const render = (gridId, start) => {
+            const grid = document.getElementById(gridId); if (!grid) return; grid.innerHTML = "";
+            for (let i = 0; i < 25; i++) {
+                const idx = start + i; const slot = document.createElement('div');
                 slot.className = userData.stickers.includes(idx) ? "sticker-slot" : "sticker-slot empty";
-                slot.textContent = userData.stickers.includes(idx) ? emoji : "?";
-                elements.stickerGrid.appendChild(slot);
-            });
-        }
+                slot.textContent = userData.stickers.includes(idx) ? FINAL_STICKERS[idx] : idx + 1;
+                grid.appendChild(slot);
+            }
+        };
+        render("sticker-grid-1", 0); render("sticker-grid-2", 25);
     }
 
     function initialize() {
-        const ids = [
-            'settings-screen', 'quiz-screen', 'results-screen', 'record-screen',
-            'dan-select', 'dan-selector', 'dan-mode-label', 'start-button',
-            'problem-text', 'answer-display', 'check-button', 'next-button',
-            'next-button-container', 'progress-text', 'final-score', 'review-button',
-            'reset-quiz-button', 'keypad', 'open-record-btn', 'close-record-btn',
-            'display-xp', 'display-level', 'display-tickets', 'display-xp-bar',
-            'record-level', 'record-rank', 'record-xp-bar', 'next-level-xp',
-            'sticker-grid', 'perfect-badge', 'ticket-get-box', 'gained-xp',
-            'combo-display', 'combo-count', 'confetti-container', 'gacha-machine',
-            'gacha-animation-area', 'gacha-pull-btn', 'record-tickets',
-            'gacha-result-overlay', 'gacha-result-icon', 'gacha-result-text',
-            'gacha-close-result', 'weekly-reward-indicator', 'weekly-status-text',
-            'gacha-confirm-modal', 'confirm-gacha-yes', 'confirm-gacha-no',
-            'level-up-modal', 'close-level-up-btn', 'new-level-display',
-            'tutorial-modal', 'close-tutorial-btn', 'sticker-complete-modal',
-            'close-complete-btn', 'sticker-count-display'
-        ];
-        
-        ids.forEach(id => {
-            elements[id.replace(/-([a-z])/g, (g) => g[1].toUpperCase())] = document.getElementById(id);
-        });
-
-        for (let i = 1; i <= 9; i++) {
-            const opt = document.createElement('option');
-            opt.value = i; opt.textContent = `${i} のかず`;
-            if (elements.danSelect) elements.danSelect.appendChild(opt);
-        }
-        
+        const ids = ['settings-screen', 'quiz-screen', 'results-screen', 'record-screen', 'dan-select', 'dan-selector', 'dan-mode-label', 'start-button', 'problem-text', 'answer-display', 'check-button', 'next-button', 'next-button-container', 'progress-text', 'final-score', 'review-button', 'reset-quiz-button', 'keypad', 'open-record-btn', 'close-record-btn', 'display-xp', 'display-level', 'display-tickets', 'display-xp-bar', 'record-level', 'record-rank', 'record-xp-bar', 'next-level-xp', 'sticker-grid-1', 'sticker-grid-2', 'perfect-badge', 'ticket-get-box', 'gained-xp', 'combo-display', 'combo-count', 'confetti-container', 'gacha-machine', 'gacha-animation-area', 'gacha-pull-btn', 'record-tickets', 'gacha-result-overlay', 'gacha-result-icon', 'gacha-result-text', 'gacha-close-result', 'gacha-confirm-modal', 'confirm-gacha-yes', 'confirm-gacha-no', 'level-up-modal', 'close-level-up-btn', 'new-level-display', 'tutorial-modal', 'close-tutorial-btn', 'sticker-complete-modal', 'close-complete-btn', 'sticker-count-display', 'page-complete-modal', 'close-page-complete-btn', 'grand-complete-modal', 'reset-collection-btn', 'next-lap-display', 'lap-display-top', 'display-lap', 'lap-display-record', 'display-lap-record', 'lucky-badge'];
+        ids.forEach(id => { const el = document.getElementById(id); if(el) elements[id.replace(/-([0-9a-z])/g, (g) => g.replace('-','').toUpperCase())] = el; });
         loadData();
-
-        if (!userData.hasSeenTutorial && elements.tutorialModal) {
-            elements.tutorialModal.classList.remove('hidden');
-        }
-
-        if (elements.startButton) {
-            elements.startButton.addEventListener('click', () => {
-                SoundManager.init(); 
-                SoundManager.click();
-                generateProblems();
-                showScreen('quiz');
-                displayCurrentProblem();
-            });
-        }
-
-        document.getElementsByName('mode').forEach(r => r.addEventListener('change', () => {
-            SoundManager.click();
-            if (elements.danSelector) elements.danSelector.classList.toggle('hidden', r.value !== 'dan');
-        }));
-
-        document.getElementsByName('operation').forEach(r => r.addEventListener('change', () => {
-            SoundManager.click();
-            const labels = {'add': 'たす数', 'sub': 'ひく数', 'mul': 'だん', 'div': 'わり数'};
-            if (elements.danModeLabel) elements.danModeLabel.textContent = `「${labels[r.value]}」を えらぶ`;
-        }));
-
-        if (elements.nextButton) elements.nextButton.addEventListener('click', nextProblem);
-        if (elements.reviewButton) elements.reviewButton.addEventListener('click', () => { SoundManager.click(); showScreen('settings'); });
-        if (elements.resetQuizButton) elements.resetQuizButton.addEventListener('click', () => { SoundManager.click(); showScreen('settings'); });
-        
-        if (elements.openRecordBtn) {
-            elements.openRecordBtn.addEventListener('click', () => { 
-                SoundManager.click();
-                updateAllUI(); 
-                showScreen('record'); 
-            });
-        }
-        
-        if (elements.closeRecordBtn) elements.closeRecordBtn.addEventListener('click', () => { SoundManager.click(); showScreen('settings'); });
-        if (elements.gachaPullBtn) elements.gachaPullBtn.addEventListener('click', () => { SoundManager.click(); pullGacha(); });
-        
-        if (elements.gachaCloseResult) {
-            elements.gachaCloseResult.addEventListener('click', () => {
-                SoundManager.click();
-                if (elements.gachaResultOverlay) elements.gachaResultOverlay.classList.add('hidden');
-                if (elements.gachaAnimArea) elements.gachaAnimArea.textContent = "🔮";
-                if (elements.gachaStatus) elements.gachaStatus.textContent = "チケット1まいで 1回ひけるよ！";
-                updateAllUI();
-            });
-        }
-
-        if (elements.closeLevelUpBtn) {
-            elements.closeLevelUpBtn.addEventListener('click', () => {
-                SoundManager.click();
-                if (elements.levelUpModal) elements.levelUpModal.classList.add('hidden');
-                const total = quizState.problems.length;
-                const correct = quizState.correctCount;
-                if (correct === total && elements.gachaConfirmModal) {
-                    elements.gachaConfirmModal.classList.remove('hidden');
-                }
-            });
-        }
-
-        if (elements.closeTutorialBtn) {
-            elements.closeTutorialBtn.addEventListener('click', () => {
-                SoundManager.init(); 
-                SoundManager.click();
-                if (elements.tutorialModal) elements.tutorialModal.classList.add('hidden');
-                userData.hasSeenTutorial = true;
-                saveData();
-            });
-        }
-
-        if (elements.closeCompleteBtn) {
-            elements.closeCompleteBtn.addEventListener('click', () => {
-                SoundManager.click();
-                if (elements.stickerCompleteModal) elements.stickerCompleteModal.classList.add('hidden');
-            });
-        }
-
-        if (elements.confirmGachaYes) {
-            elements.confirmGachaYes.addEventListener('click', () => {
-                SoundManager.click();
-                if (elements.gachaConfirmModal) elements.gachaConfirmModal.classList.add('hidden');
-                updateAllUI();
-                showScreen('record');
-            });
-        }
-        if (elements.confirmGachaNo) {
-            elements.confirmGachaNo.addEventListener('click', () => {
-                SoundManager.click();
-                if (elements.gachaConfirmModal) elements.gachaConfirmModal.classList.add('hidden');
-            });
-        }
-
-        if (elements.keypad) {
-            elements.keypad.addEventListener('click', (e) => {
-                const btn = e.target.closest('button');
-                if (!btn || quizState.isAwaitingNext) return;
-                SoundManager.click();
-                const val = btn.dataset.val;
-                if (val === 'C') {
-                    quizState.currentInput = "";
-                    if (elements.answerDisplay) elements.answerDisplay.textContent = "？";
-                } else if (val === 'Enter') {
-                    if (quizState.currentInput !== "") checkAnswer();
-                } else if (quizState.currentInput.length < 3) {
-                    quizState.currentInput += val;
-                    if (elements.answerDisplay) elements.answerDisplay.textContent = quizState.currentInput;
-                }
-            });
-        }
-
-        showScreen('settings');
+        if (!userData.hasSeenTutorial && elements.tutorialModal) elements.tutorialModal.classList.remove('hidden');
+        if(elements.startButton) elements.startButton.addEventListener('click', () => { SoundManager.init(); SoundManager.click(); generateProblems(); showScreen('quiz'); displayCurrentProblem(); });
+        document.getElementsByName('operation').forEach(r => r.addEventListener('change', (e) => { const labels = {add:'たす数', sub:'ひく数', mul:'だん', div:'わり数'}; elements.danModeLabel.textContent = `「${labels[e.target.value]}」を えらぶ`; updateDanSelectOptions(); }));
+        document.getElementsByName('mode').forEach(r => r.addEventListener('change', (e) => { if (elements.danSelector) elements.danSelector.classList.toggle('hidden', e.target.value !== 'dan'); }));
+        if(elements.nextButton) elements.nextButton.addEventListener('click', () => { SoundManager.click(); quizState.isAwaitingNext = false; quizState.currentIndex++; if (quizState.currentIndex < quizState.problems.length) displayCurrentProblem(); else finishQuiz(); });
+        if(elements.reviewButton) elements.reviewButton.addEventListener('click', () => { SoundManager.click(); showScreen('settings'); updateDanSelectOptions(); });
+        if(elements.resetQuizButton) elements.resetQuizButton.addEventListener('click', () => { SoundManager.click(); showScreen('settings'); updateDanSelectOptions(); });
+        if(elements.openRecordBtn) elements.openRecordBtn.addEventListener('click', () => { SoundManager.click(); updateAllUI(); showScreen('record'); });
+        if(elements.closeRecordBtn) elements.closeRecordBtn.addEventListener('click', () => { SoundManager.click(); showScreen('settings'); updateDanSelectOptions(); });
+        if(elements.gachaPullBtn) elements.gachaPullBtn.addEventListener('click', () => { SoundManager.click(); pullGacha(); });
+        if(elements.gachaCloseResult) elements.gachaCloseResult.addEventListener('click', () => { SoundManager.click(); if (elements.gachaResultOverlay) elements.gachaResultOverlay.classList.add('hidden'); if (elements.gachaAnimArea) elements.gachaAnimArea.textContent = "🔮"; updateAllUI(); });
+        if(elements.closeLevelUpBtn) elements.closeLevelUpBtn.addEventListener('click', () => { SoundManager.click(); if (elements.levelUpModal) elements.levelUpModal.classList.add('hidden'); if (quizState.correctCount === quizState.problems.length && elements.gachaConfirmModal) elements.gachaConfirmModal.classList.remove('hidden'); });
+        if(elements.closeTutorialBtn) elements.closeTutorialBtn.addEventListener('click', () => { SoundManager.init(); SoundManager.click(); if (elements.tutorialModal) elements.tutorialModal.classList.add('hidden'); userData.hasSeenTutorial = true; saveData(); });
+        if(elements.confirmGachaYes) elements.confirmGachaYes.addEventListener('click', () => { SoundManager.click(); if (elements.gachaConfirmModal) elements.gachaConfirmModal.classList.remove('hidden'); updateAllUI(); showScreen('record'); });
+        if(elements.confirmGachaNo) elements.confirmGachaNo.addEventListener('click', () => { SoundManager.click(); if (elements.gachaConfirmModal) elements.gachaConfirmModal.classList.add('hidden'); });
+        if(elements.closeCompleteBtn) elements.closeCompleteBtn.addEventListener('click', () => { SoundManager.click(); if (elements.stickerCompleteModal) elements.stickerCompleteModal.classList.add('hidden'); });
+        if(elements.closePageCompleteBtn) elements.closePageCompleteBtn.addEventListener('click', () => { SoundManager.click(); if (elements.pageCompleteModal) elements.pageCompleteModal.classList.add('hidden'); });
+        if(elements.resetCollectionBtn) elements.resetCollectionBtn.addEventListener('click', () => { SoundManager.click(); userData.stickers = []; userData.bingosClaimed = []; userData.pageRewardsClaimed = []; userData.lapCount += 1; saveData(); updateAllUI(); if (elements.grandCompleteModal) elements.grandCompleteModal.classList.add('hidden'); showScreen('settings'); });
+        if(elements.keypad) elements.keypad.addEventListener('click', (e) => {
+            const btn = e.target.closest('button'); if (!btn || quizState.isAwaitingNext) return; SoundManager.click(); const val = btn.dataset.val;
+            if (val === 'C') { quizState.currentInput = ""; if (elements.answerDisplay) elements.answerDisplay.textContent = "？"; }
+            else if (val === 'Enter') { if (quizState.currentInput !== "") checkAnswer(); }
+            else if (quizState.currentInput.length < 3) { quizState.currentInput += val; if (elements.answerDisplay) elements.answerDisplay.textContent = quizState.currentInput; }
+        });
+        showScreen('settings'); updateDanSelectOptions();
     }
-
     window.onload = initialize;
 </script>
-
 </body>
 </html>
