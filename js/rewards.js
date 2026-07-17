@@ -43,12 +43,11 @@ function checkCollectionProgress() {
     if (p1Full && !userData.pageRewardsClaimed.includes(1)) { userData.pageRewardsClaimed.push(1); awardTicket(3); SoundManager.levelUp(); if(elements.pageCompleteModal) elements.pageCompleteModal.classList.remove('hidden'); triggerConfetti(); }
     if (p2Full && !userData.pageRewardsClaimed.includes(2)) { userData.pageRewardsClaimed.push(2); awardTicket(3); SoundManager.levelUp(); if(elements.pageCompleteModal) elements.pageCompleteModal.classList.remove('hidden'); triggerConfetti(); }
     if (userData.stickers.length === 50) {
-        setTimeout(() => {
-            if (elements.gachaResultOverlay) elements.gachaResultOverlay.classList.add('hidden');
-            if (elements.nextLapDisplay) elements.nextLapDisplay.textContent = userData.lapCount + 1;
-            if (elements.grandCompleteModal) elements.grandCompleteModal.classList.remove('hidden');
-            SoundManager.complete(); triggerConfetti();
-        }, 2000);
+        // この関数はガチャ結果オーバーレイを閉じたあとに呼ばれるので、オーバーレイ操作は不要。
+        // 直接コンプ達成モーダルを表示する。
+        if (elements.nextLapDisplay) elements.nextLapDisplay.textContent = userData.lapCount + 1;
+        if (elements.grandCompleteModal) elements.grandCompleteModal.classList.remove('hidden');
+        SoundManager.complete(); triggerConfetti();
     }
 }
 
@@ -87,6 +86,7 @@ function pullGacha() {
 
         if (elements.gachaResultOverlay) elements.gachaResultOverlay.classList.remove('hidden');
 
-        checkBingo(); checkCollectionProgress(); updateRecordUI();
+        // コンプ判定（checkCollectionProgress）はガチャ結果を閉じたあとに呼ぶため、ここでは呼ばない（E）。
+        checkBingo(); updateRecordUI();
     }, 1200);
 }
