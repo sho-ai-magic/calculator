@@ -363,6 +363,78 @@
                 </div>
             </div>
 
+            <!-- おうちのかた画面（大人向け・落ち着いたトーン） -->
+            <div id="parent-screen" class="hidden h-full flex flex-col p-5 bg-slate-50 overflow-hidden relative">
+                <div class="flex justify-between items-center mb-4 flex-shrink-0">
+                    <h1 class="text-lg font-bold text-slate-700">おうちのかたへ</h1>
+                    <button id="close-parent-btn" class="text-xs bg-white border border-slate-300 text-slate-600 font-bold px-3 py-1.5 rounded-lg shadow-sm active:scale-95 transition">もどる</button>
+                </div>
+
+                <div class="flex-grow overflow-y-auto scroll-hide space-y-4 pb-6 px-1 text-slate-700">
+                    <!-- 学習状況サマリー -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm text-center">
+                            <p class="text-[11px] text-slate-400 font-medium">がんばった日数（累計）</p>
+                            <p class="text-2xl font-bold text-slate-700 mt-1"><span id="parent-total-days">0</span> 日</p>
+                        </div>
+                        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm text-center">
+                            <p class="text-[11px] text-slate-400 font-medium">連続日数</p>
+                            <p class="text-2xl font-bold text-slate-700 mt-1"><span id="parent-streak">0</span> 日</p>
+                        </div>
+                    </div>
+
+                    <!-- 演算別 正答率 -->
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <h2 class="text-sm font-bold text-slate-600 mb-3">演算別の正答率（全期間）</h2>
+                        <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                            <div class="flex justify-between"><span class="text-slate-500">たし算</span><span class="font-bold" id="parent-rate-add">-</span></div>
+                            <div class="flex justify-between"><span class="text-slate-500">ひき算</span><span class="font-bold" id="parent-rate-sub">-</span></div>
+                            <div class="flex justify-between"><span class="text-slate-500">かけ算</span><span class="font-bold" id="parent-rate-mul">-</span></div>
+                            <div class="flex justify-between"><span class="text-slate-500">わり算</span><span class="font-bold" id="parent-rate-div">-</span></div>
+                        </div>
+                    </div>
+
+                    <!-- 直近7日の回答数 棒グラフ -->
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <h2 class="text-sm font-bold text-slate-600 mb-3">直近7日の回答数</h2>
+                        <div id="parent-chart" class="flex items-end justify-between gap-1.5 h-24"></div>
+                    </div>
+
+                    <!-- まちがいノート残り -->
+                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center">
+                        <span class="text-sm text-slate-600">まちがいノートの残り</span>
+                        <span class="text-lg font-bold text-slate-700"><span id="parent-wrong-count">0</span> 問</span>
+                    </div>
+
+                    <!-- 学習モード切替 -->
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <h2 class="text-sm font-bold text-slate-600 mb-2">学習モードの切り替え</h2>
+                        <label class="flex items-start space-x-3 cursor-pointer">
+                            <input type="checkbox" id="parent-freeretry-toggle" class="w-5 h-5 mt-0.5 accent-slate-600 flex-shrink-0">
+                            <span class="text-xs text-slate-500 leading-relaxed">
+                                <span class="font-bold text-slate-700">くりかえしモード</span><br>
+                                オフ：まんべんなくモード（クリアした段はロックされ、全部クリアで再挑戦できます）<br>
+                                オン：くりかえしモード（クリアした段も何度でも挑戦できます）
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 大人ゲート（保護者確認）モーダル -->
+            <div id="parent-gate-modal" class="modal-overlay hidden">
+                <div class="bg-white p-6 rounded-2xl border border-slate-300 shadow-2xl w-full text-center space-y-4 pop-up">
+                    <p class="text-sm font-bold text-slate-600">おうちのかた確認</p>
+                    <p class="text-xl font-bold text-slate-800"><span id="parent-gate-question">12 × 3</span> = ?</p>
+                    <input type="number" id="parent-gate-input" class="w-full p-3 border border-slate-300 rounded-lg text-center text-lg outline-none focus:border-slate-500" inputmode="numeric">
+                    <p id="parent-gate-error" class="text-xs text-red-500 font-bold h-4"></p>
+                    <div class="flex space-x-2">
+                        <button id="parent-gate-cancel" class="flex-1 py-3 text-sm font-bold text-slate-500 bg-slate-100 rounded-lg">やめる</button>
+                        <button id="parent-gate-ok" class="flex-1 py-3 text-sm font-bold text-white bg-slate-600 rounded-lg">OK</button>
+                    </div>
+                </div>
+            </div>
+
             <div id="sticker-complete-modal" class="modal-overlay hidden">
                 <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 p-6 rounded-[2.5rem] border-4 border-yellow-400 shadow-2xl w-full text-center space-y-6 pop-up">
                     <div class="text-7xl">🎉🎖️✨</div>

@@ -23,6 +23,15 @@ function removeWrongProblem(problem) {
     userData.wrongProblems = userData.wrongProblems.filter(w => `${w.opCode}:${w.n1}:${w.n2}` !== key);
 }
 
+// おうちの人画面用に、問題ごとの回答数と正解数を日付・演算別に記録する。
+function recordPlayLog(problem, correct) {
+    const today = getTodayStr();
+    if (!userData.playLog[today]) userData.playLog[today] = {};
+    if (!userData.playLog[today][problem.opCode]) userData.playLog[today][problem.opCode] = { t: 0, c: 0 };
+    userData.playLog[today][problem.opCode].t++;
+    if (correct) userData.playLog[today][problem.opCode].c++;
+}
+
 // きょうの日付を "YYYY-MM-DD"（ローカルタイム）で返す。toISOStringは使わない（時差でズレるため）。
 function getTodayStr() {
     if (window.__mockToday) return window.__mockToday; // テスト用の日付上書き

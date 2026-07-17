@@ -66,6 +66,7 @@ function checkAnswer() {
     elements.keypad.classList.add('hidden'); elements.nextButtonContainer.classList.remove('hidden');
     const correct = (userAnswer === problem.ans);
     recordProblemStat(problem, correct); // 苦手判定用の正誤記録
+    recordPlayLog(problem, correct);     // おうちの人画面用の記録
     if (correct) {
         quizState.correctCount++; quizState.currentCombo++; SoundManager.correct();
         elements.answerDisplay.textContent = "○ せいかい！";

@@ -1,7 +1,7 @@
 // アプリの起動処理をまとめたファイル。画面の部品を集めて、ボタンなどの操作にはたらきを結びつける。
 
 function initialize() {
-    const ids = ['settings-screen', 'quiz-screen', 'results-screen', 'record-screen', 'dan-select', 'dan-selector', 'dan-mode-label', 'start-button', 'problem-text', 'answer-display', 'check-button', 'next-button', 'next-button-container', 'progress-text', 'final-score', 'review-button', 'reset-quiz-button', 'keypad', 'open-record-btn', 'close-record-btn', 'display-xp', 'display-level', 'display-tickets', 'display-xp-bar', 'record-level', 'record-rank', 'record-xp-bar', 'next-level-xp', 'sticker-grid-1', 'sticker-grid-2', 'perfect-badge', 'ticket-get-box', 'gained-xp', 'combo-display', 'combo-count', 'confetti-container', 'gacha-machine', 'gacha-animation-area', 'gacha-pull-btn', 'record-tickets', 'gacha-result-overlay', 'gacha-result-icon', 'gacha-result-text', 'gacha-close-result', 'gacha-confirm-modal', 'confirm-gacha-yes', 'confirm-gacha-no', 'level-up-modal', 'close-level-up-btn', 'new-level-display', 'tutorial-modal', 'close-tutorial-btn', 'sticker-complete-modal', 'close-complete-btn', 'page-complete-modal', 'close-page-complete-btn', 'grand-complete-modal', 'reset-collection-btn', 'next-lap-display', 'lap-display-top', 'display-lap', 'lap-display-record', 'display-lap-record', 'lucky-badge', 'review-quiz-btn', 'review-empty-modal', 'close-review-empty-btn', 'stamp-get-toast'];
+    const ids = ['settings-screen', 'quiz-screen', 'results-screen', 'record-screen', 'dan-select', 'dan-selector', 'dan-mode-label', 'start-button', 'problem-text', 'answer-display', 'check-button', 'next-button', 'next-button-container', 'progress-text', 'final-score', 'review-button', 'reset-quiz-button', 'keypad', 'open-record-btn', 'close-record-btn', 'display-xp', 'display-level', 'display-tickets', 'display-xp-bar', 'record-level', 'record-rank', 'record-xp-bar', 'next-level-xp', 'sticker-grid-1', 'sticker-grid-2', 'perfect-badge', 'ticket-get-box', 'gained-xp', 'combo-display', 'combo-count', 'confetti-container', 'gacha-machine', 'gacha-animation-area', 'gacha-pull-btn', 'record-tickets', 'gacha-result-overlay', 'gacha-result-icon', 'gacha-result-text', 'gacha-close-result', 'gacha-confirm-modal', 'confirm-gacha-yes', 'confirm-gacha-no', 'level-up-modal', 'close-level-up-btn', 'new-level-display', 'tutorial-modal', 'close-tutorial-btn', 'sticker-complete-modal', 'close-complete-btn', 'page-complete-modal', 'close-page-complete-btn', 'grand-complete-modal', 'reset-collection-btn', 'next-lap-display', 'lap-display-top', 'display-lap', 'lap-display-record', 'display-lap-record', 'lucky-badge', 'review-quiz-btn', 'review-empty-modal', 'close-review-empty-btn', 'stamp-get-toast', 'open-parent-link', 'parent-screen', 'close-parent-btn', 'parent-gate-modal', 'parent-gate-question', 'parent-gate-input', 'parent-gate-error', 'parent-gate-cancel', 'parent-gate-ok', 'parent-freeretry-toggle'];
     ids.forEach(id => { const el = document.getElementById(id); if(el) elements[id.replace(/-([0-9a-z])/g, (g) => g.replace('-','').toUpperCase())] = el; });
     loadData();
     if (!userData.hasSeenTutorial && elements.tutorialModal) elements.tutorialModal.classList.remove('hidden');
@@ -39,6 +39,50 @@ function initialize() {
         else if (val === 'Enter') { if (quizState.currentInput !== "") checkAnswer(); }
         else if (quizState.currentInput.length < 3) { quizState.currentInput += val; if (elements.answerDisplay) elements.answerDisplay.textContent = quizState.currentInput; }
     });
+    // おうちのかた入口：大人ゲートを開く
+    if(elements.openParentLink) elements.openParentLink.addEventListener('click', () => { SoundManager.init(); SoundManager.click(); openParentGate(); });
+    if(elements.parentGateCancel) elements.parentGateCancel.addEventListener('click', () => { SoundManager.click(); if (elements.parentGateModal) elements.parentGateModal.classList.add('hidden'); });
+    if(elements.parentGateOk) elements.parentGateOk.addEventListener('click', () => { SoundManager.click(); submitParentGate(); });
+    if(elements.parentGateInput) elements.parentGateInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitParentGate(); });
+    if(elements.closeParentBtn) elements.closeParentBtn.addEventListener('click', () => { SoundManager.click(); showScreen('settings'); updateDanSelectOptions(); });
+    if(elements.parentFreeretryToggle) elements.parentFreeretryToggle.addEventListener('change', (e) => {
+        userData.parentSettings.freeRetry = e.target.checked; saveData(); updateDanSelectOptions();
+    });
+
     showScreen('settings'); updateDanSelectOptions();
 }
+
+// 大人ゲートの答え（正解の掛け算）を一時的に保持する
+let parentGateAnswer = 0;
+
+// 大人ゲートを開く：2桁×1桁の掛け算をランダムに出す
+function openParentGate() {
+    const n1 = Math.floor(Math.random() * (49 - 12 + 1)) + 12; // 12〜49
+    const n2 = Math.floor(Math.random() * (9 - 3 + 1)) + 3;    // 3〜9
+    parentGateAnswer = n1 * n2;
+    if (elements.parentGateQuestion) elements.parentGateQuestion.textContent = `${n1} × ${n2}`;
+    if (elements.parentGateInput) elements.parentGateInput.value = "";
+    if (elements.parentGateError) elements.parentGateError.textContent = "";
+    if (elements.parentGateModal) elements.parentGateModal.classList.remove('hidden');
+    if (elements.parentGateInput) elements.parentGateInput.focus();
+}
+
+// 大人ゲートの答え合わせ：正解なら画面へ、不正解なら新しい問題を出す
+function submitParentGate() {
+    const val = parseInt(elements.parentGateInput ? elements.parentGateInput.value : "", 10);
+    if (val === parentGateAnswer) {
+        if (elements.parentGateModal) elements.parentGateModal.classList.add('hidden');
+        enterParentScreen();
+    } else {
+        openParentGate(); // 新しい問題を再出題（入力もクリアされる）
+        if (elements.parentGateError) elements.parentGateError.textContent = "ちがいます";
+    }
+}
+
+// おうちのかた画面へ入る（ゲート正解後に呼ばれる）
+function enterParentScreen() {
+    showScreen('parent');
+    renderParentScreen();
+}
+
 window.onload = initialize;
