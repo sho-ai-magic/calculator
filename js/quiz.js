@@ -69,28 +69,56 @@ function checkAnswer() {
     if (correct) {
         quizState.correctCount++; quizState.currentCombo++; SoundManager.correct();
         elements.answerDisplay.textContent = "○ せいかい！";
+        // 復習モードで正解したら、まちがいノートから取り除く
+        if (quizState.mode === 'review') removeWrongProblem(problem);
         if (quizState.currentCombo >= 2) {
             if (elements.comboCount) elements.comboCount.textContent = quizState.currentCombo;
             if (elements.comboDisplay) { elements.comboDisplay.classList.remove('hidden'); setTimeout(() => elements.comboDisplay.classList.add('hidden'), 800); }
         }
-    } else { quizState.currentCombo = 0; SoundManager.incorrect(); elements.answerDisplay.textContent = `× こたえ:${problem.ans}`; }
+    } else { quizState.currentCombo = 0; SoundManager.incorrect(); elements.answerDisplay.textContent = `× こたえ:${problem.ans}`; recordWrongProblem(problem); }
     quizState.isAwaitingNext = true;
+}
+
+// まちがいノートの復習クイズを始める（古い順に最大9問）
+function startReviewQuiz() {
+    const sym = {add:'＋', sub:'－', mul:'×', div:'÷'};
+    const p = userData.wrongProblems.slice(0, 9).map(w => ({
+        n1: w.n1, n2: w.n2, op: sym[w.opCode], opCode: w.opCode, ans: w.ans
+    }));
+    quizState.problems = p; quizState.currentIndex = 0; quizState.correctCount = 0; quizState.currentCombo = 0;
+    quizState.mode = 'review'; quizState.opCode = p.length ? p[0].opCode : 'add';
+    showScreen('quiz'); displayCurrentProblem();
 }
 
 function finishQuiz() {
     const total = quizState.problems.length; const correct = quizState.correctCount; const isPerfect = (correct === total);
-    const op = document.querySelector('input[name="operation"]:checked').value; const mode = document.querySelector('input[name="mode"]:checked').value;
+    const isReview = (quizState.mode === 'review');
+    const mode = document.querySelector('input[name="mode"]:checked').value;
     const dan = parseInt(elements.danSelect.value, 10);
-    if (mode === 'dan' && isPerfect) { if (!userData.clearedDans[op].includes(dan)) userData.clearedDans[op].push(dan); }
+    // 復習モードでは段クリア（clearedDans）は更新しない
+    if (!isReview && mode === 'dan' && isPerfect) { if (!userData.clearedDans[quizState.opCode].includes(dan)) userData.clearedDans[quizState.opCode].push(dan); }
     let xpGained = correct * 5 + (isPerfect ? 20 : 0);
     const leveledUp = addXP(xpGained); if (isPerfect) awardTicket(1);
+    // 復習でまちがいノートが空になったらチケット+1
+    const reviewCleared = isReview && userData.wrongProblems.length === 0;
+    if (reviewCleared) awardTicket(1);
     if (elements.finalScore) elements.finalScore.textContent = `${correct} / ${total}`;
     if (elements.gainedXp) elements.gainedXp.textContent = xpGained;
     showScreen('results');
     (async () => {
         if (isPerfect) { triggerConfetti(); await new Promise(r => setTimeout(r, 1000)); }
-        if (leveledUp) { SoundManager.levelUp(); const lv = calculateLevelFromXp(userData.xp).level; if (elements.newLevelDisplay) elements.newLevelDisplay.textContent = lv; if (elements.levelUpModal) elements.levelUpModal.classList.remove('hidden'); }
-        else if (isPerfect) if (elements.gachaConfirmModal) elements.gachaConfirmModal.classList.remove('hidden');
+        if (leveledUp) {
+            SoundManager.levelUp(); const lv = calculateLevelFromXp(userData.xp).level;
+            if (elements.newLevelDisplay) elements.newLevelDisplay.textContent = lv;
+            if (elements.levelUpModal) elements.levelUpModal.classList.remove('hidden');
+            // レベルアップ表示中は他のモーダルを同時に出さない（閉じたあとにreview-emptyを出す）
+        } else if (reviewCleared) {
+            // 復習でノートが空になったお祝い（ガチャ確認は出さない）
+            if (elements.reviewEmptyModal) elements.reviewEmptyModal.classList.remove('hidden');
+        } else if (isPerfect) {
+            if (elements.gachaConfirmModal) elements.gachaConfirmModal.classList.remove('hidden');
+        }
     })();
     saveData();
+    if (elements.reviewQuizBtn) updateReviewButton();
 }

@@ -9,7 +9,19 @@ function showScreen(screenName) {
     if (screenName === 'record' && elements.recordScreen) elements.recordScreen.classList.remove('hidden');
 }
 
-function updateAllUI() { updateTopBar(); updateRecordUI(); updateDanSelectOptions(); }
+function updateAllUI() { updateTopBar(); updateRecordUI(); updateDanSelectOptions(); updateReviewButton(); }
+
+// まちがいノートボタンの表示・ラベル更新（残り0問なら隠す）
+function updateReviewButton() {
+    if (!elements.reviewQuizBtn) return;
+    const n = userData.wrongProblems.length;
+    if (n > 0) {
+        elements.reviewQuizBtn.textContent = `📖 まちがいノート（${n}もん）`;
+        elements.reviewQuizBtn.classList.remove('hidden');
+    } else {
+        elements.reviewQuizBtn.classList.add('hidden');
+    }
+}
 
 function updateTopBar() {
     const lvInfo = calculateLevelFromXp(userData.xp);

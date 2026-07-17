@@ -10,6 +10,19 @@ function recordProblemStat(problem, correct) {
     else userData.problemStats[key].w++;
 }
 
+// まちがいノートに問題を追加する（同じ問題は重複させない）
+function recordWrongProblem(problem) {
+    const key = `${problem.opCode}:${problem.n1}:${problem.n2}`;
+    const exists = userData.wrongProblems.some(w => `${w.opCode}:${w.n1}:${w.n2}` === key);
+    if (!exists) userData.wrongProblems.push({ opCode: problem.opCode, n1: problem.n1, n2: problem.n2, ans: problem.ans });
+}
+
+// まちがいノートから問題を取り除く（復習で正解したとき）
+function removeWrongProblem(problem) {
+    const key = `${problem.opCode}:${problem.n1}:${problem.n2}`;
+    userData.wrongProblems = userData.wrongProblems.filter(w => `${w.opCode}:${w.n1}:${w.n2}` !== key);
+}
+
 function addXP(amount) {
     const oldLvInfo = calculateLevelFromXp(userData.xp);
     userData.xp += amount;
