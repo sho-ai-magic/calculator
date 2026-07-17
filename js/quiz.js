@@ -95,6 +95,8 @@ function finishQuiz() {
     const isReview = (quizState.mode === 'review');
     const mode = document.querySelector('input[name="mode"]:checked').value;
     const dan = parseInt(elements.danSelect.value, 10);
+    // 毎日スタンプと連続記録の処理
+    const firstToday = recordDailyStamp(); const streak = calcStreak(); checkStreakReward(streak);
     // 復習モードでは段クリア（clearedDans）は更新しない
     if (!isReview && mode === 'dan' && isPerfect) { if (!userData.clearedDans[quizState.opCode].includes(dan)) userData.clearedDans[quizState.opCode].push(dan); }
     let xpGained = correct * 5 + (isPerfect ? 20 : 0);
@@ -105,6 +107,11 @@ function finishQuiz() {
     if (elements.finalScore) elements.finalScore.textContent = `${correct} / ${total}`;
     if (elements.gainedXp) elements.gainedXp.textContent = xpGained;
     showScreen('results');
+    // きょう初めてのスタンプならトーストを数秒だけ表示
+    if (firstToday && elements.stampGetToast) {
+        elements.stampGetToast.classList.remove('hidden');
+        setTimeout(() => { if (elements.stampGetToast) elements.stampGetToast.classList.add('hidden'); }, 2500);
+    }
     (async () => {
         if (isPerfect) { triggerConfetti(); await new Promise(r => setTimeout(r, 1000)); }
         if (leveledUp) {

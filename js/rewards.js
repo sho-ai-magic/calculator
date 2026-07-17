@@ -23,6 +23,65 @@ function removeWrongProblem(problem) {
     userData.wrongProblems = userData.wrongProblems.filter(w => `${w.opCode}:${w.n1}:${w.n2}` !== key);
 }
 
+// きょうの日付を "YYYY-MM-DD"（ローカルタイム）で返す。toISOStringは使わない（時差でズレるため）。
+function getTodayStr() {
+    if (window.__mockToday) return window.__mockToday; // テスト用の日付上書き
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+}
+
+// きょうのスタンプを押す。初めてならpushして60日分にトリム、trueを返す。
+function recordDailyStamp() {
+    const today = getTodayStr();
+    if (userData.stamps.includes(today)) return false;
+    userData.stamps.push(today);
+    if (userData.stamps.length > 60) userData.stamps = userData.stamps.slice(-60);
+    return true;
+}
+
+// 連続でスタンプを押した日数を数える。今日が無ければ昨日を起点にする。
+function calcStreak() {
+    const set = new Set(userData.stamps);
+    // 起点の日付を決める（今日があれば今日、無ければ昨日、それも無ければ0）
+    const base = new Date(getTodayStr() + 'T00:00:00');
+    const fmt = (dt) => {
+        const y = dt.getFullYear();
+        const m = String(dt.getMonth() + 1).padStart(2, '0');
+        const day = String(dt.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    };
+    let cursor = new Date(base);
+    if (!set.has(fmt(cursor))) {
+        cursor.setDate(cursor.getDate() - 1); // 今日が無ければ昨日を起点に
+        if (!set.has(fmt(cursor))) return 0;  // 昨日も無ければ連続0
+    }
+    let count = 0;
+    while (set.has(fmt(cursor))) {
+        count++;
+        cursor.setDate(cursor.getDate() - 1);
+    }
+    return count;
+}
+
+// 連続記録に応じてチケットを付与する（多重付与を防ぐ）。
+function checkStreakReward(streak) {
+    if (streak > userData.streakLastClaimed) {
+        // 前回受け取り済みの翌日から今回のstreakまで、各日ごとに判定して付与
+        for (let d = userData.streakLastClaimed + 1; d <= streak; d++) {
+            if (d % 3 === 0) awardTicket(1);
+            if (d % 7 === 0) awardTicket(2);
+        }
+        userData.streakLastClaimed = streak;
+    } else if (streak < userData.streakLastClaimed) {
+        // 連続が途切れたら基準を引き下げるだけ（付与なし）
+        userData.streakLastClaimed = streak;
+    }
+    saveData();
+}
+
 function addXP(amount) {
     const oldLvInfo = calculateLevelFromXp(userData.xp);
     userData.xp += amount;

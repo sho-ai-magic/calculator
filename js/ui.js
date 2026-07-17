@@ -79,4 +79,39 @@ function updateRecordUI() {
         }
     };
     render("sticker-grid-1", 0); render("sticker-grid-2", 25);
+    renderStampSection();
+}
+
+// 毎日スタンプ（直近7日）と連続日数を描く
+function renderStampSection() {
+    const row = document.getElementById('stamp-days-row');
+    if (row) {
+        row.innerHTML = "";
+        const set = new Set(userData.stamps);
+        const fmt = (dt) => {
+            const y = dt.getFullYear();
+            const m = String(dt.getMonth() + 1).padStart(2, '0');
+            const day = String(dt.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        };
+        const base = new Date(getTodayStr() + 'T00:00:00');
+        // 6日前〜今日の順に並べる
+        for (let i = 6; i >= 0; i--) {
+            const dt = new Date(base);
+            dt.setDate(dt.getDate() - i);
+            const stamped = set.has(fmt(dt));
+            const cell = document.createElement('div');
+            cell.className = "flex flex-col items-center flex-1";
+            const mark = document.createElement('div');
+            mark.className = stamped ? "text-2xl" : "text-2xl opacity-30";
+            mark.textContent = stamped ? "⭐" : "○";
+            const label = document.createElement('div');
+            label.className = "text-[10px] font-bold text-gray-400 mt-0.5";
+            label.textContent = dt.getDate();
+            cell.appendChild(mark); cell.appendChild(label);
+            row.appendChild(cell);
+        }
+    }
+    const streakEl = document.getElementById('streak-count');
+    if (streakEl) streakEl.textContent = calcStreak();
 }
