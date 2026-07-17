@@ -45,11 +45,15 @@ function updateDanSelectOptions() {
     const clearedList = userData.clearedDans[op] || [];
     elements.danSelect.innerHTML = "";
     let availableCount = 0;
+    const free = userData.parentSettings.freeRetry;
     for (let i = 1; i <= 9; i++) {
         const opt = document.createElement('option');
         opt.value = i;
-        if (clearedList.includes(i)) { opt.textContent = `✅ ${i} クリア！`; opt.disabled = true; }
-        else { opt.textContent = `${i} のかず`; availableCount++; }
+        if (clearedList.includes(i)) {
+            opt.textContent = free ? `✅ ${i}（もう1かい）` : `✅ ${i} クリア！`;
+            opt.disabled = !free;
+            if (free) availableCount++;
+        } else { opt.textContent = `${i} のかず`; availableCount++; }
         elements.danSelect.appendChild(opt);
     }
     if (availableCount === 0 && clearedList.length > 0) { userData.clearedDans[op] = []; saveData(); updateDanSelectOptions(); }
