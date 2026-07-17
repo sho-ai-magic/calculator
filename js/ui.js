@@ -17,9 +17,12 @@ function updateTopBar() {
     if (elements.displayLevel) elements.displayLevel.textContent = lvInfo.level;
     if (elements.displayTickets) elements.displayTickets.textContent = userData.tickets;
     if (elements.displayXpBar) elements.displayXpBar.style.width = `${(lvInfo.xpInLevel / lvInfo.requiredXp) * 100}%`;
+    // 周回数の表示（上部バー）。1しゅうめのときは隠す（I）。
     if (userData.lapCount > 1) {
         if (elements.lapDisplayTop) elements.lapDisplayTop.classList.remove('hidden');
         if (elements.displayLap) elements.displayLap.textContent = userData.lapCount;
+    } else {
+        if (elements.lapDisplayTop) elements.lapDisplayTop.classList.add('hidden');
     }
 }
 
@@ -47,8 +50,13 @@ function updateRecordUI() {
     if (elements.nextLevelXp) elements.nextLevelXp.textContent = lvInfo.requiredXp - lvInfo.xpInLevel;
     if (elements.recordTickets) elements.recordTickets.textContent = userData.tickets;
     if (elements.gachaPullBtn) elements.gachaPullBtn.disabled = (userData.tickets <= 0);
-    if (elements.stickerCountDisplay) elements.stickerCountDisplay.textContent = userData.stickers.length;
-    if (userData.lapCount > 1) { if(elements.lapDisplayRecord) elements.lapDisplayRecord.classList.remove('hidden'); if(elements.displayLapRecord) elements.displayLapRecord.textContent = userData.lapCount; }
+    // 周回数の表示（記録画面）。1しゅうめのときは隠す（I）。
+    if (userData.lapCount > 1) {
+        if(elements.lapDisplayRecord) elements.lapDisplayRecord.classList.remove('hidden');
+        if(elements.displayLapRecord) elements.displayLapRecord.textContent = userData.lapCount;
+    } else {
+        if(elements.lapDisplayRecord) elements.lapDisplayRecord.classList.add('hidden');
+    }
     const render = (gridId, start) => {
         const grid = document.getElementById(gridId); if (!grid) return; grid.innerHTML = "";
         for (let i = 0; i < 25; i++) {
