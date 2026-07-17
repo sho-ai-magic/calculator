@@ -1,0 +1,179 @@
+/* 見た目（デザイン・色・アニメーション）をまとめたファイル。元 index.html の <style> の中身。 */
+
+:root {
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+    touch-action: pan-y;
+    background: linear-gradient(135deg, #fff5f7 0%, #f0f4ff 50%, #f5fff0 100%);
+}
+
+.main-container {
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 12px;
+}
+
+.deco-icon {
+    position: absolute;
+    z-index: 0;
+    opacity: 0.3;
+    pointer-events: none;
+    user-select: none;
+}
+
+.card {
+    position: relative;
+    z-index: 10;
+    background-color: rgba(255, 255, 255, 0.95);
+    border: 4px solid #ffffff;
+    border-radius: 2rem;
+    width: 100%;
+    max-width: 420px;
+    height: 100%;
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 15px 40px rgba(255, 182, 193, 0.25);
+    overflow: hidden;
+}
+
+/* ボタンデザイン */
+.btn-base {
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border-bottom: 5px solid rgba(0,0,0,0.15);
+    color: white;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-base:active {
+    transform: translateY(3px);
+    border-bottom-width: 0;
+}
+
+.kawaii-pink { background-color: #ff99cc; border-bottom-color: #ff66a3; }
+.kawaii-blue { background-color: #87ceeb; border-bottom-color: #5fbadd; }
+.kawaii-green { background-color: #98fb98; border-bottom-color: #6edb6e; }
+.kawaii-purple { background-color: #ccb3ff; border-bottom-color: #a680ff; }
+.kawaii-orange { background-color: #ffb366; border-bottom-color: #ff9933; }
+.kawaii-gold { background: linear-gradient(135deg, #ffd700, #ff8c00); border-bottom: 4px solid #e67e00; }
+
+.keypad-btn {
+    font-size: 1.5rem;
+    border-radius: 1.25rem;
+    background-color: #eef9ff;
+    color: #70c1ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 48px;
+    border-bottom: 4px solid #ccebff;
+}
+.keypad-btn:active {
+    transform: translateY(2px);
+    border-bottom-width: 0;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+.floating { animation: float 3s ease-in-out infinite; }
+
+@keyframes gacha-shake {
+    0% { transform: rotate(0); }
+    25% { transform: rotate(10deg); }
+    50% { transform: rotate(0); }
+    75% { transform: rotate(-10deg); }
+    100% { transform: rotate(0); }
+}
+.gacha-shake { animation: gacha-shake 0.2s infinite; }
+
+@keyframes pop-up {
+    0% { transform: scale(0); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+.pop-up { animation: pop-up 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+.scroll-hide::-webkit-scrollbar { display: none; }
+.scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+.sticker-slot {
+    aspect-ratio: 1;
+    background: #fff;
+    border: 2px dashed #ffcce0;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    position: relative;
+}
+.sticker-slot.empty { opacity: 0.2; font-size: 0.75rem; color: #ffcce0; }
+
+.confetti {
+    position: absolute;
+    top: -20px;
+    user-select: none;
+    pointer-events: none;
+    z-index: 110;
+}
+
+.op-tile {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+.op-tile-inner {
+    border: 4px solid transparent;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+.op-tile input:checked + .op-tile-inner {
+    border-color: #ff99cc;
+    background-color: #fff5f7;
+    transform: scale(1.1);
+    z-index: 20;
+    box-shadow: 0 0 15px rgba(255, 153, 204, 0.3);
+}
+
+@keyframes combo-pop {
+    0% { transform: scale(0.5) rotate(-5deg); opacity: 0; }
+    50% { transform: scale(1.2) rotate(5deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+.combo-anim { animation: combo-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+.modal-overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(255, 182, 193, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+@keyframes rainbow-border {
+    0% { border-color: #ff99cc; }
+    33% { border-color: #87ceeb; }
+    66% { border-color: #98fb98; }
+    100% { border-color: #ff99cc; }
+}
+.rainbow-border {
+    animation: rainbow-border 2s linear infinite;
+    border-width: 6px;
+}
