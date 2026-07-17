@@ -6,21 +6,49 @@ function generateProblems() {
     const dan = parseInt(elements.danSelect.value, 10);
     let p = []; const range = [1,2,3,4,5,6,7,8,9]; const sym = {add:'＋', sub:'－', mul:'×', div:'÷'};
     if (mode === 'dan') {
-        if (op === 'mul') range.forEach(n2 => p.push({n1:dan, n2, op:sym[op], ans:dan*n2}));
-        else if (op === 'add') range.forEach(n2 => p.push({n1:dan, n2, op:sym[op], ans:dan+n2}));
-        else if (op === 'sub') range.forEach(ans => p.push({n1:ans+dan, n2:dan, op:sym[op], ans}));
-        else if (op === 'div') range.forEach(ans => p.push({n1:ans*dan, n2:dan, op:sym[op], ans}));
+        if (op === 'mul') range.forEach(n2 => p.push({n1:dan, n2, op:sym[op], ans:dan*n2, opCode:op}));
+        else if (op === 'add') range.forEach(n2 => p.push({n1:dan, n2, op:sym[op], ans:dan+n2, opCode:op}));
+        else if (op === 'sub') range.forEach(ans => p.push({n1:ans+dan, n2:dan, op:sym[op], ans, opCode:op}));
+        else if (op === 'div') range.forEach(ans => p.push({n1:ans*dan, n2:dan, op:sym[op], ans, opCode:op}));
     } else {
         range.forEach(n1 => range.forEach(n2 => {
-            if(op==='mul') p.push({n1, n2, op:sym[op], ans:n1*n2});
-            else if(op==='add') p.push({n1, n2, op:sym[op], ans:n1+n2});
-            else if(op==='sub') p.push({n1:n1+n2, n2, op:sym[op], ans:n1});
-            else if(op==='div') p.push({n1:n1*n2, n2, op:sym[op], ans:n1});
+            if(op==='mul') p.push({n1, n2, op:sym[op], ans:n1*n2, opCode:op});
+            else if(op==='add') p.push({n1, n2, op:sym[op], ans:n1+n2, opCode:op});
+            else if(op==='sub') p.push({n1:n1+n2, n2, op:sym[op], ans:n1, opCode:op});
+            else if(op==='div') p.push({n1:n1*n2, n2, op:sym[op], ans:n1, opCode:op});
         }));
-        p = [...p].sort(() => Math.random() - 0.5).slice(0, 10);
+        // 苦手な問題ほど出やすいように重み付きで10問えらぶ
+        p = weightedSample(p, 10);
     }
     if (document.querySelector('input[name="order"]:checked').value === 'random') p = [...p].sort(() => Math.random() - 0.5);
     quizState.problems = p; quizState.currentIndex = 0; quizState.correctCount = 0; quizState.currentCombo = 0;
+    quizState.mode = 'normal'; quizState.opCode = op;
+}
+
+// 苦手な問題ほど出やすくする重み付き抽選。重複なしで count 件返す。
+function weightedSample(pool, count) {
+    const items = pool.map(problem => {
+        const key = `${problem.opCode}:${problem.n1}:${problem.n2}`;
+        const stat = userData.problemStats[key];
+        // 重み = 1 + 3×(まちがい率)。未出題（統計なし）は重み1。
+        let weight = 1;
+        if (stat && (stat.c + stat.w) > 0) weight = 1 + 3 * (stat.w / (stat.c + stat.w));
+        return { problem, weight };
+    });
+    const result = [];
+    const n = Math.min(count, items.length);
+    for (let i = 0; i < n; i++) {
+        const totalWeight = items.reduce((sum, it) => sum + it.weight, 0);
+        let r = Math.random() * totalWeight;
+        let pickIndex = 0;
+        for (let j = 0; j < items.length; j++) {
+            r -= items[j].weight;
+            if (r <= 0) { pickIndex = j; break; }
+        }
+        result.push(items[pickIndex].problem);
+        items.splice(pickIndex, 1); // えらんだ問題は取り除いて重複を防ぐ
+    }
+    return result;
 }
 
 function displayCurrentProblem() {
@@ -36,7 +64,9 @@ function checkAnswer() {
     const problem = quizState.problems[quizState.currentIndex];
     const userAnswer = parseInt(quizState.currentInput, 10);
     elements.keypad.classList.add('hidden'); elements.nextButtonContainer.classList.remove('hidden');
-    if (userAnswer === problem.ans) {
+    const correct = (userAnswer === problem.ans);
+    recordProblemStat(problem, correct); // 苦手判定用の正誤記録
+    if (correct) {
         quizState.correctCount++; quizState.currentCombo++; SoundManager.correct();
         elements.answerDisplay.textContent = "○ せいかい！";
         if (quizState.currentCombo >= 2) {

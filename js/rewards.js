@@ -2,6 +2,14 @@
 
 function awardTicket(count = 1) { userData.tickets += count; saveData(); updateTopBar(); if(elements.recordTickets) elements.recordTickets.textContent = userData.tickets; }
 
+// 問題ごとの正誤回数を記録する（苦手判定用）。key = "opCode:n1:n2"
+function recordProblemStat(problem, correct) {
+    const key = `${problem.opCode}:${problem.n1}:${problem.n2}`;
+    if (!userData.problemStats[key]) userData.problemStats[key] = { c: 0, w: 0 };
+    if (correct) userData.problemStats[key].c++;
+    else userData.problemStats[key].w++;
+}
+
 function addXP(amount) {
     const oldLvInfo = calculateLevelFromXp(userData.xp);
     userData.xp += amount;
